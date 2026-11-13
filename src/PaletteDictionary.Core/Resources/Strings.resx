@@ -1,0 +1,387 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms</value>
+  </resheader>
+  <data xml:space="preserve" name="AppName">
+    <value>Local Dictionary</value>
+  </data>
+  <data xml:space="preserve" name="SettingsTitle">
+    <value>Local Dictionary Settings</value>
+  </data>
+  <data xml:space="preserve" name="OpenSettings">
+    <value>Open dictionary settings</value>
+  </data>
+  <data xml:space="preserve" name="Lookup">
+    <value>Look up</value>
+  </data>
+  <data xml:space="preserve" name="SearchPlaceholder">
+    <value>Type a word or phrase for suggestions and spelling corrections</value>
+  </data>
+  <data xml:space="preserve" name="ExtensionSubtitle">
+    <value>Headword suggestions and spelling corrections · Definitions in GoldenDict-ng</value>
+  </data>
+  <data xml:space="preserve" name="SettingsSubtitle">
+    <value>Set program paths, dictionaries, groups and search preferences</value>
+  </data>
+  <data xml:space="preserve" name="ManageSettings">
+    <value>Manage dictionaries, groups and search preferences</value>
+  </data>
+  <data xml:space="preserve" name="OpenGoldenDict">
+    <value>Open in GoldenDict-ng</value>
+  </data>
+  <data xml:space="preserve" name="ReloadDictionaries">
+    <value>Reload configuration and dictionaries</value>
+  </data>
+  <data xml:space="preserve" name="RebuildCache">
+    <value>Rebuild headword cache</value>
+  </data>
+  <data xml:space="preserve" name="RebuildingCache">
+    <value>Rebuilding headword cache in the background…</value>
+  </data>
+  <data xml:space="preserve" name="Reloading">
+    <value>Reloading in the background…</value>
+  </data>
+  <data xml:space="preserve" name="PathHint">
+    <value>Paste paths as plain text; no escaping needed. Save to apply changes.</value>
+  </data>
+  <data xml:space="preserve" name="SettingsLoadFailed">
+    <value>Unable to load settings: </value>
+  </data>
+  <data xml:space="preserve" name="Save">
+    <value>Save</value>
+  </data>
+  <data xml:space="preserve" name="AddGroup">
+    <value>Add group</value>
+  </data>
+  <data xml:space="preserve" name="Reload">
+    <value>Reload</value>
+  </data>
+  <data xml:space="preserve" name="BasicSettings">
+    <value>General</value>
+  </data>
+  <data xml:space="preserve" name="ProgramPath">
+    <value>GoldenDict-ng executable path</value>
+  </data>
+  <data xml:space="preserve" name="ProgramPathPlaceholder">
+    <value>e.g. C:\Program Files\GoldenDict\GoldenDict.exe</value>
+  </data>
+  <data xml:space="preserve" name="DefaultGroup">
+    <value>Default group</value>
+  </data>
+  <data xml:space="preserve" name="MaxResults">
+    <value>Suggestion limit</value>
+  </data>
+  <data xml:space="preserve" name="Debounce">
+    <value>Typing delay (ms)</value>
+  </data>
+  <data xml:space="preserve" name="FuzzyMatching">
+    <value>Spelling corrections</value>
+  </data>
+  <data xml:space="preserve" name="MaxEditDistance">
+    <value>Maximum edit distance</value>
+  </data>
+  <data xml:space="preserve" name="IgnoreDiacritics">
+    <value>Ignore accents (é / e)</value>
+  </data>
+  <data xml:space="preserve" name="AddDictionary">
+    <value>Add dictionary</value>
+  </data>
+  <data xml:space="preserve" name="RemoveGroup">
+    <value>Remove group</value>
+  </data>
+  <data xml:space="preserve" name="GroupName">
+    <value>Group name</value>
+  </data>
+  <data xml:space="preserve" name="GoldenDictGroup">
+    <value>GoldenDict group (blank = current)</value>
+  </data>
+  <data xml:space="preserve" name="Enabled">
+    <value>Enabled</value>
+  </data>
+  <data xml:space="preserve" name="RemoveDictionary">
+    <value>Remove dictionary</value>
+  </data>
+  <data xml:space="preserve" name="DictionaryName">
+    <value>Dictionary name (optional)</value>
+  </data>
+  <data xml:space="preserve" name="MdxPath">
+    <value>MDX file path</value>
+  </data>
+  <data xml:space="preserve" name="SaveHint">
+    <value>Save after adding or removing groups or dictionaries. Saving updates configuration only; dictionary files are not checked, modified or deleted.</value>
+  </data>
+  <data xml:space="preserve" name="StaleSettings">
+    <value>Settings have changed. Please use the current page.</value>
+  </data>
+  <data xml:space="preserve" name="Reloaded">
+    <value>Configuration reloaded.</value>
+  </data>
+  <data xml:space="preserve" name="SavedHint">
+    <value>Saved. Changes apply automatically; no restart needed.</value>
+  </data>
+  <data xml:space="preserve" name="GroupAdded">
+    <value>Group added. Save to apply.</value>
+  </data>
+  <data xml:space="preserve" name="DictionaryAdded">
+    <value>Dictionary added. Paste an MDX path and save.</value>
+  </data>
+  <data xml:space="preserve" name="DictionaryRemoved">
+    <value>Dictionary removed from configuration. Save to apply.</value>
+  </data>
+  <data xml:space="preserve" name="GroupRemoved">
+    <value>Group removed. Save to apply.</value>
+  </data>
+  <data xml:space="preserve" name="UnknownSettingsAction">
+    <value>Unknown settings action.</value>
+  </data>
+  <data xml:space="preserve" name="SettingsSaved">
+    <value>Settings saved</value>
+  </data>
+  <data xml:space="preserve" name="SelectDefaultGroup">
+    <value>Please select a default group.</value>
+  </data>
+  <data xml:space="preserve" name="InvalidInteger">
+    <value>Please enter a valid integer.</value>
+  </data>
+  <data xml:space="preserve" name="InvalidToggle">
+    <value>Please select an on/off state.</value>
+  </data>
+  <data xml:space="preserve" name="SuggestionsFailed">
+    <value>Unable to load suggestions</value>
+  </data>
+  <data xml:space="preserve" name="LookupHint">
+    <value>Type a word, choose a suggestion, and press Enter for definitions in GoldenDict-ng.</value>
+  </data>
+  <data xml:space="preserve" name="ConfigureDictionaries">
+    <value>Configure dictionaries and GoldenDict-ng</value>
+  </data>
+  <data xml:space="preserve" name="ConfigureHint">
+    <value>Paste program and dictionary paths in Palette settings.</value>
+  </data>
+  <data xml:space="preserve" name="ConfigureFirst">
+    <value>Configure your dictionaries first</value>
+  </data>
+  <data xml:space="preserve" name="ConfigureFirstHint">
+    <value>Open Palette settings and paste program and dictionary paths</value>
+  </data>
+  <data xml:space="preserve" name="QueryTooLong">
+    <value>Query too long for suggestions</value>
+  </data>
+  <data xml:space="preserve" name="QueryLimitHint">
+    <value>Suggestions support up to 256 UTF-16 characters. Direct lookup supports up to 512 characters.</value>
+  </data>
+  <data xml:space="preserve" name="UpdatingIndex">
+    <value>Updating headword index in the background…</value>
+  </data>
+  <data xml:space="preserve" name="InitialIndexHint">
+    <value>The first import reads the MDX headword sections.</value>
+  </data>
+  <data xml:space="preserve" name="ExistingIndexHint">
+    <value>The existing index remains available.</value>
+  </data>
+  <data xml:space="preserve" name="UpdateFailed">
+    <value>Configuration or index update failed</value>
+  </data>
+  <data xml:space="preserve" name="SetProgramPath">
+    <value>Set the GoldenDict-ng executable path</value>
+  </data>
+  <data xml:space="preserve" name="SetProgramPathHint">
+    <value>Open Palette settings and paste the executable path</value>
+  </data>
+  <data xml:space="preserve" name="DictionariesUnavailable">
+    <value>Some dictionaries could not be loaded</value>
+  </data>
+  <data xml:space="preserve" name="BackupRecovered">
+    <value>The configuration could not be read. The last backup was loaded; review settings and save to apply.</value>
+  </data>
+  <data xml:space="preserve" name="InvalidConfigurationRecovered">
+    <value>The configuration could not be read. Enter your settings again; saving will preserve a copy of the original file.</value>
+  </data>
+  <data xml:space="preserve" name="ConfigurationConflict">
+    <value>Configuration changed elsewhere. Reload before applying edits to avoid overwriting newer changes.</value>
+  </data>
+  <data xml:space="preserve" name="NewGroup">
+    <value>New group</value>
+  </data>
+  <data xml:space="preserve" name="KeepOneGroup">
+    <value>Keep at least one group.</value>
+  </data>
+  <data xml:space="preserve" name="SelectMdx">
+    <value>Please use an .mdx dictionary file.</value>
+  </data>
+  <data xml:space="preserve" name="EmptyConfiguration">
+    <value>The configuration file is empty.</value>
+  </data>
+  <data xml:space="preserve" name="RequireGroup">
+    <value>At least one dictionary group is required.</value>
+  </data>
+  <data xml:space="preserve" name="InvalidGroup">
+    <value>Each group must have a name and a dictionaries list.</value>
+  </data>
+  <data xml:space="preserve" name="DuplicateGroup">
+    <value>Group names must be unique.</value>
+  </data>
+  <data xml:space="preserve" name="InvalidDefaultGroup">
+    <value>defaultGroup must match a configured group.</value>
+  </data>
+  <data xml:space="preserve" name="InvalidSearchOptions">
+    <value>maxResults must be 1–100, debounceMilliseconds 0–1000, and maxEditDistance 0–2.</value>
+  </data>
+  <data xml:space="preserve" name="EmptyDictionaryPath">
+    <value>Dictionary paths cannot be empty.</value>
+  </data>
+  <data xml:space="preserve" name="ConfigurationChangedDuringBuild">
+    <value>Configuration changed while building the index. It will retry automatically.</value>
+  </data>
+  <data xml:space="preserve" name="InvalidProgramPath">
+    <value>Set a valid GoldenDict-ng executable path in settings.</value>
+  </data>
+  <data xml:space="preserve" name="InvalidQuery">
+    <value>The query must contain between 1 and 512 characters.</value>
+  </data>
+  <data xml:space="preserve" name="LaunchFailed">
+    <value>Unable to start GoldenDict-ng.</value>
+  </data>
+  <data xml:space="preserve" name="DictionaryNotFound">
+    <value>Dictionary file not found.</value>
+  </data>
+  <data xml:space="preserve" name="DictionaryChanged">
+    <value>The dictionary changed while being read. Wait for the file to finish writing, then retry.</value>
+  </data>
+  <data xml:space="preserve" name="MdxInvalidHeaderLength">
+    <value>Invalid MDX header length.</value>
+  </data>
+  <data xml:space="preserve" name="MdxHeaderChecksum">
+    <value>MDX header checksum mismatch.</value>
+  </data>
+  <data xml:space="preserve" name="MdxEncrypted">
+    <value>Password-protected or device-locked MDX files are not supported. Encrypted=0/2 is supported.</value>
+  </data>
+  <data xml:space="preserve" name="MdxHeadwordLimit">
+    <value>MDX headword count exceeds supported limits.</value>
+  </data>
+  <data xml:space="preserve" name="MdxKeywordChecksum">
+    <value>MDX keyword section checksum mismatch.</value>
+  </data>
+  <data xml:space="preserve" name="MdxMissingTerminator">
+    <value>MDX headword terminator is missing.</value>
+  </data>
+  <data xml:space="preserve" name="MdxEntryCount">
+    <value>MDX keyword block entry count mismatch.</value>
+  </data>
+  <data xml:space="preserve" name="MdxIndexStructure">
+    <value>Inconsistent MDX keyword index structure.</value>
+  </data>
+  <data xml:space="preserve" name="MdxBoundary">
+    <value>MDX block boundary is out of range.</value>
+  </data>
+  <data xml:space="preserve" name="MdxShortBlock">
+    <value>MDX compressed block is too short.</value>
+  </data>
+  <data xml:space="preserve" name="MdxDecompressionLength">
+    <value>MDX decompressed data exceeds the expected length.</value>
+  </data>
+  <data xml:space="preserve" name="MdxBlockChecksum">
+    <value>MDX compressed block length or checksum mismatch.</value>
+  </data>
+  <data xml:space="preserve" name="MdxShortEncryptedIndex">
+    <value>MDX encrypted index is too short.</value>
+  </data>
+  <data xml:space="preserve" name="MdxIndexBounds">
+    <value>MDX index read is out of range.</value>
+  </data>
+  <data xml:space="preserve" name="MdxBlockTooLarge">
+    <value>MDX data block is too large.</value>
+  </data>
+  <data xml:space="preserve" name="MdxIncompleteFile">
+    <value>MDX file is incomplete.</value>
+  </data>
+  <data xml:space="preserve" name="LzoShortInput">
+    <value>LZO data is too short.</value>
+  </data>
+  <data xml:space="preserve" name="LzoLength">
+    <value>LZO length mismatch.</value>
+  </data>
+  <data xml:space="preserve" name="LzoInputBounds">
+    <value>LZO input is out of range.</value>
+  </data>
+  <data xml:space="preserve" name="LzoLiteralBounds">
+    <value>LZO literal is out of range.</value>
+  </data>
+  <data xml:space="preserve" name="LzoReferenceBounds">
+    <value>LZO back-reference is out of range.</value>
+  </data>
+  <data xml:space="preserve" name="IndexLoadFailed">
+    <value>Index loading failed.</value>
+  </data>
+  <data xml:space="preserve" name="QueryPrompt">
+    <value>Query: </value>
+  </data>
+  <data xml:space="preserve" name="GroupNumber">
+    <value>Group {0}</value>
+  </data>
+  <data xml:space="preserve" name="DictionaryNumber">
+    <value>Dictionary {0}</value>
+  </data>
+  <data xml:space="preserve" name="Correction">
+    <value>Spelling correction · {0} edits · </value>
+  </data>
+  <data xml:space="preserve" name="HeadwordCount">
+    <value>{0:N0} headwords · {1}</value>
+  </data>
+  <data xml:space="preserve" name="DirectLookup">
+    <value>Look up: {0}</value>
+  </data>
+  <data xml:space="preserve" name="OpenInGroup">
+    <value>Open in GoldenDict-ng · {0}</value>
+  </data>
+  <data xml:space="preserve" name="MdxOnly">
+    <value>Only .mdx files are accepted: {0}</value>
+  </data>
+  <data xml:space="preserve" name="DuplicateDictionary">
+    <value>Group “{0}” contains duplicate dictionary files.</value>
+  </data>
+  <data xml:space="preserve" name="MdxUnsupportedVersion">
+    <value>MDX {0} is not supported. Supported versions: 1.x and 2.x.</value>
+  </data>
+  <data xml:space="preserve" name="MdxCompressionType">
+    <value>Unknown MDX compression type: {0}</value>
+  </data>
+  <data xml:space="preserve" name="CopyGroup">
+    <value>{0} copy</value>
+  </data>
+  <data xml:space="preserve" name="CliReadHeadwords">
+    <value>Read {0:N0} headwords in {1:F1} ms</value>
+  </data>
+  <data xml:space="preserve" name="CliLoadIndex">
+    <value>Index loaded in {0:F1} ms</value>
+  </data>
+  <data xml:space="preserve" name="CliSearch">
+    <value>{0:N0} headwords; query: {1:F2} ms</value>
+  </data>
+  <data xml:space="preserve" name="Language">
+    <value>Interface language</value>
+  </data>
+  <data xml:space="preserve" name="SystemLanguage">
+    <value>Follow system</value>
+  </data>
+  <data xml:space="preserve" name="InvalidLanguage">
+    <value>Interface language must be auto, en or zh-Hans.</value>
+  </data>
+  <data xml:space="preserve" name="DefaultGroupName">
+    <value>Default</value>
+  </data>
+  <data name="CorrectionSingular" xml:space="preserve">
+    <value>Spelling correction · {0} edit · </value>
+  </data>
+</root>

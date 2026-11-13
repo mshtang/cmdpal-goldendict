@@ -1,0 +1,22 @@
+name: Bug report
+description: Report an installation, search, or settings problem.
+body:
+  - type: textarea
+    id: environment
+    attributes:
+      label: Versions
+      description: Include extension, Windows, Command Palette, and GoldenDict-ng versions.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: What did you do, what happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Additional details
+      description: Include the error message or relevant installer log excerpt, if available.

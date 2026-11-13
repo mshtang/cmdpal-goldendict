@@ -1,0 +1,16 @@
+**/bin/
+**/obj/
+.vs/
+artifacts/
+*.user
+*.mdx
+*.mdd
+*.pfx
+*.cache
+*.pdhw
+cache/
+config.local.json
+*.cer
+*.msix
+*.msixbundle
+*.log

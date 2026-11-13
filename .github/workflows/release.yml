@@ -1,0 +1,36 @@
+name: Publish development release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yml
+  publish:
+    needs: build
+    runs-on: windows-latest
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Publish installer and checksum
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          [xml]$props = Get-Content Directory.Build.props -Raw
+          $version = [string]$props.Project.PropertyGroup.Version
+          if ($env:RELEASE_TAG -ne "v$version") { throw 'Tag and project version do not match.' }
+          $notes = "docs/releases/$($env:RELEASE_TAG).md"
+          if (!(Test-Path -LiteralPath $notes)) { throw 'Release notes are missing.' }
+          gh run download $env:GITHUB_RUN_ID --name development-installer-x64 --dir release-files
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          $files = @(Get-ChildItem release-files -File).FullName
+          gh release create $env:RELEASE_TAG @files --verify-tag --prerelease --title "CmdPal GoldenDict $version (development)" --notes-file $notes
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }

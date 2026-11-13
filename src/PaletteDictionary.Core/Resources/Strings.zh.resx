@@ -1,0 +1,387 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms</value>
+  </resheader>
+  <data xml:space="preserve" name="AppName">
+    <value>本地词典</value>
+  </data>
+  <data xml:space="preserve" name="SettingsTitle">
+    <value>本地词典设置</value>
+  </data>
+  <data xml:space="preserve" name="OpenSettings">
+    <value>打开词典设置</value>
+  </data>
+  <data xml:space="preserve" name="Lookup">
+    <value>查词</value>
+  </data>
+  <data xml:space="preserve" name="SearchPlaceholder">
+    <value>输入单词或短语，支持补全与拼写纠错</value>
+  </data>
+  <data xml:space="preserve" name="ExtensionSubtitle">
+    <value>词头补全与拼写纠错 · 在 GoldenDict-ng 中查看释义</value>
+  </data>
+  <data xml:space="preserve" name="SettingsSubtitle">
+    <value>选择程序、添加词典、管理分组和搜索偏好</value>
+  </data>
+  <data xml:space="preserve" name="ManageSettings">
+    <value>添加词典、管理分组和搜索偏好</value>
+  </data>
+  <data xml:space="preserve" name="OpenGoldenDict">
+    <value>在 GoldenDict-ng 中打开</value>
+  </data>
+  <data xml:space="preserve" name="ReloadDictionaries">
+    <value>重新加载配置与词典</value>
+  </data>
+  <data xml:space="preserve" name="RebuildCache">
+    <value>重建词头缓存</value>
+  </data>
+  <data xml:space="preserve" name="RebuildingCache">
+    <value>正在后台重建词头缓存…</value>
+  </data>
+  <data xml:space="preserve" name="Reloading">
+    <value>正在后台重新加载…</value>
+  </data>
+  <data xml:space="preserve" name="PathHint">
+    <value>粘贴路径即可，无需转义反斜杠；修改后点击保存。</value>
+  </data>
+  <data xml:space="preserve" name="SettingsLoadFailed">
+    <value>无法载入设置：</value>
+  </data>
+  <data xml:space="preserve" name="Save">
+    <value>保存</value>
+  </data>
+  <data xml:space="preserve" name="AddGroup">
+    <value>添加分组</value>
+  </data>
+  <data xml:space="preserve" name="Reload">
+    <value>重新载入</value>
+  </data>
+  <data xml:space="preserve" name="BasicSettings">
+    <value>基本设置</value>
+  </data>
+  <data xml:space="preserve" name="ProgramPath">
+    <value>GoldenDict-ng 程序路径</value>
+  </data>
+  <data xml:space="preserve" name="ProgramPathPlaceholder">
+    <value>例如 C:\Program Files\GoldenDict\GoldenDict.exe</value>
+  </data>
+  <data xml:space="preserve" name="DefaultGroup">
+    <value>默认分组</value>
+  </data>
+  <data xml:space="preserve" name="MaxResults">
+    <value>候选数量</value>
+  </data>
+  <data xml:space="preserve" name="Debounce">
+    <value>输入等待（毫秒）</value>
+  </data>
+  <data xml:space="preserve" name="FuzzyMatching">
+    <value>启用拼写纠错</value>
+  </data>
+  <data xml:space="preserve" name="MaxEditDistance">
+    <value>最多拼写差异</value>
+  </data>
+  <data xml:space="preserve" name="IgnoreDiacritics">
+    <value>忽略重音（é / e）</value>
+  </data>
+  <data xml:space="preserve" name="AddDictionary">
+    <value>添加词典</value>
+  </data>
+  <data xml:space="preserve" name="RemoveGroup">
+    <value>移除分组</value>
+  </data>
+  <data xml:space="preserve" name="GroupName">
+    <value>分组名称</value>
+  </data>
+  <data xml:space="preserve" name="GoldenDictGroup">
+    <value>GoldenDict 分组（留空沿用当前）</value>
+  </data>
+  <data xml:space="preserve" name="Enabled">
+    <value>启用</value>
+  </data>
+  <data xml:space="preserve" name="RemoveDictionary">
+    <value>移除词典</value>
+  </data>
+  <data xml:space="preserve" name="DictionaryName">
+    <value>词典名称（可留空）</value>
+  </data>
+  <data xml:space="preserve" name="MdxPath">
+    <value>MDX 文件路径</value>
+  </data>
+  <data xml:space="preserve" name="SaveHint">
+    <value>增删分组或词典后也需保存。这里只保存配置，不检查文件；原始词典文件不会被修改或删除。</value>
+  </data>
+  <data xml:space="preserve" name="StaleSettings">
+    <value>设置页已更新，请使用当前页面。</value>
+  </data>
+  <data xml:space="preserve" name="Reloaded">
+    <value>已重新载入配置。</value>
+  </data>
+  <data xml:space="preserve" name="SavedHint">
+    <value>已保存。查词配置会自动更新，无需重启。</value>
+  </data>
+  <data xml:space="preserve" name="GroupAdded">
+    <value>已添加分组，点击保存后生效。</value>
+  </data>
+  <data xml:space="preserve" name="DictionaryAdded">
+    <value>已添加词典，请粘贴 MDX 路径并保存。</value>
+  </data>
+  <data xml:space="preserve" name="DictionaryRemoved">
+    <value>已从配置中移除词典，点击保存后生效。</value>
+  </data>
+  <data xml:space="preserve" name="GroupRemoved">
+    <value>已移除分组，点击保存后生效。</value>
+  </data>
+  <data xml:space="preserve" name="UnknownSettingsAction">
+    <value>无法识别此设置操作。</value>
+  </data>
+  <data xml:space="preserve" name="SettingsSaved">
+    <value>设置已保存</value>
+  </data>
+  <data xml:space="preserve" name="SelectDefaultGroup">
+    <value>请选择默认分组。</value>
+  </data>
+  <data xml:space="preserve" name="InvalidInteger">
+    <value>请输入有效的整数。</value>
+  </data>
+  <data xml:space="preserve" name="InvalidToggle">
+    <value>请选择开关状态。</value>
+  </data>
+  <data xml:space="preserve" name="SuggestionsFailed">
+    <value>候选查询失败</value>
+  </data>
+  <data xml:space="preserve" name="LookupHint">
+    <value>输入单词后选择候选；回车在 GoldenDict-ng 中查看释义。</value>
+  </data>
+  <data xml:space="preserve" name="ConfigureDictionaries">
+    <value>配置词典和 GoldenDict-ng</value>
+  </data>
+  <data xml:space="preserve" name="ConfigureHint">
+    <value>在 Palette 设置页中粘贴程序和词典路径。</value>
+  </data>
+  <data xml:space="preserve" name="ConfigureFirst">
+    <value>请先完成词典配置</value>
+  </data>
+  <data xml:space="preserve" name="ConfigureFirstHint">
+    <value>打开 Palette 设置页，粘贴程序和词典路径</value>
+  </data>
+  <data xml:space="preserve" name="QueryTooLong">
+    <value>查询内容过长，未生成候选</value>
+  </data>
+  <data xml:space="preserve" name="QueryLimitHint">
+    <value>最多 256 个 UTF-16 字符；仍可直接发送不超过 512 字符的查询。</value>
+  </data>
+  <data xml:space="preserve" name="UpdatingIndex">
+    <value>正在后台更新词头索引…</value>
+  </data>
+  <data xml:space="preserve" name="InitialIndexHint">
+    <value>首次导入需要读取 MDX 词头区。</value>
+  </data>
+  <data xml:space="preserve" name="ExistingIndexHint">
+    <value>仍可使用已完成的索引。</value>
+  </data>
+  <data xml:space="preserve" name="UpdateFailed">
+    <value>配置或索引更新失败</value>
+  </data>
+  <data xml:space="preserve" name="SetProgramPath">
+    <value>请设置 GoldenDict-ng 程序路径</value>
+  </data>
+  <data xml:space="preserve" name="SetProgramPathHint">
+    <value>打开 Palette 设置页，粘贴程序路径</value>
+  </data>
+  <data xml:space="preserve" name="DictionariesUnavailable">
+    <value>部分词典未载入</value>
+  </data>
+  <data xml:space="preserve" name="BackupRecovered">
+    <value>原配置无法读取，已载入上次备份。请检查设置，再保存并应用。</value>
+  </data>
+  <data xml:space="preserve" name="InvalidConfigurationRecovered">
+    <value>原配置无法读取，请重新设置。保存时会保留原文件副本。</value>
+  </data>
+  <data xml:space="preserve" name="ConfigurationConflict">
+    <value>配置已在其他地方更改。请重新载入，再应用修改，以免覆盖新内容。</value>
+  </data>
+  <data xml:space="preserve" name="NewGroup">
+    <value>新分组</value>
+  </data>
+  <data xml:space="preserve" name="KeepOneGroup">
+    <value>至少保留一个分组。</value>
+  </data>
+  <data xml:space="preserve" name="SelectMdx">
+    <value>请选择 .mdx 词典文件。</value>
+  </data>
+  <data xml:space="preserve" name="EmptyConfiguration">
+    <value>配置文件为空。</value>
+  </data>
+  <data xml:space="preserve" name="RequireGroup">
+    <value>至少需要一个词典分组。</value>
+  </data>
+  <data xml:space="preserve" name="InvalidGroup">
+    <value>分组必须包含名称和 dictionaries 列表。</value>
+  </data>
+  <data xml:space="preserve" name="DuplicateGroup">
+    <value>分组名称不能重复。</value>
+  </data>
+  <data xml:space="preserve" name="InvalidDefaultGroup">
+    <value>defaultGroup 必须对应一个已配置分组。</value>
+  </data>
+  <data xml:space="preserve" name="InvalidSearchOptions">
+    <value>maxResults 应为 1–100，debounceMilliseconds 为 0–1000，maxEditDistance 为 0–2。</value>
+  </data>
+  <data xml:space="preserve" name="EmptyDictionaryPath">
+    <value>词典路径不能为空。</value>
+  </data>
+  <data xml:space="preserve" name="ConfigurationChangedDuringBuild">
+    <value>配置在索引构建期间变化，将自动重试。</value>
+  </data>
+  <data xml:space="preserve" name="InvalidProgramPath">
+    <value>请在配置中填写有效的 GoldenDict-ng 可执行文件路径。</value>
+  </data>
+  <data xml:space="preserve" name="InvalidQuery">
+    <value>查询内容不能为空，且不能超过 512 个字符。</value>
+  </data>
+  <data xml:space="preserve" name="LaunchFailed">
+    <value>无法启动 GoldenDict-ng。</value>
+  </data>
+  <data xml:space="preserve" name="DictionaryNotFound">
+    <value>找不到词典文件。</value>
+  </data>
+  <data xml:space="preserve" name="DictionaryChanged">
+    <value>词典在读取期间发生变化，请等待文件写入完成后重试。</value>
+  </data>
+  <data xml:space="preserve" name="MdxInvalidHeaderLength">
+    <value>MDX 文件头长度无效。</value>
+  </data>
+  <data xml:space="preserve" name="MdxHeaderChecksum">
+    <value>MDX 文件头校验失败。</value>
+  </data>
+  <data xml:space="preserve" name="MdxEncrypted">
+    <value>不支持需要密码或设备授权的 MDX 文件；支持 Encrypted=0/2。</value>
+  </data>
+  <data xml:space="preserve" name="MdxHeadwordLimit">
+    <value>MDX 词头数量超出支持范围。</value>
+  </data>
+  <data xml:space="preserve" name="MdxKeywordChecksum">
+    <value>MDX 词头区校验失败。</value>
+  </data>
+  <data xml:space="preserve" name="MdxMissingTerminator">
+    <value>MDX 词头缺少结束标记。</value>
+  </data>
+  <data xml:space="preserve" name="MdxEntryCount">
+    <value>MDX 词头块条目数量不一致。</value>
+  </data>
+  <data xml:space="preserve" name="MdxIndexStructure">
+    <value>MDX 词头索引结构不一致。</value>
+  </data>
+  <data xml:space="preserve" name="MdxBoundary">
+    <value>MDX 块边界越界。</value>
+  </data>
+  <data xml:space="preserve" name="MdxShortBlock">
+    <value>MDX 压缩块过短。</value>
+  </data>
+  <data xml:space="preserve" name="MdxDecompressionLength">
+    <value>MDX 解压后长度过大。</value>
+  </data>
+  <data xml:space="preserve" name="MdxBlockChecksum">
+    <value>MDX 压缩块长度或校验和错误。</value>
+  </data>
+  <data xml:space="preserve" name="MdxShortEncryptedIndex">
+    <value>MDX 加密索引过短。</value>
+  </data>
+  <data xml:space="preserve" name="MdxIndexBounds">
+    <value>MDX 索引读取越界。</value>
+  </data>
+  <data xml:space="preserve" name="MdxBlockTooLarge">
+    <value>MDX 数据块过大。</value>
+  </data>
+  <data xml:space="preserve" name="MdxIncompleteFile">
+    <value>MDX 文件不完整。</value>
+  </data>
+  <data xml:space="preserve" name="LzoShortInput">
+    <value>LZO 数据过短。</value>
+  </data>
+  <data xml:space="preserve" name="LzoLength">
+    <value>LZO 长度不一致。</value>
+  </data>
+  <data xml:space="preserve" name="LzoInputBounds">
+    <value>LZO 输入越界。</value>
+  </data>
+  <data xml:space="preserve" name="LzoLiteralBounds">
+    <value>LZO 字面量越界。</value>
+  </data>
+  <data xml:space="preserve" name="LzoReferenceBounds">
+    <value>LZO 回溯引用越界。</value>
+  </data>
+  <data xml:space="preserve" name="IndexLoadFailed">
+    <value>索引加载失败。</value>
+  </data>
+  <data xml:space="preserve" name="QueryPrompt">
+    <value>查询词：</value>
+  </data>
+  <data xml:space="preserve" name="GroupNumber">
+    <value>分组 {0}</value>
+  </data>
+  <data xml:space="preserve" name="DictionaryNumber">
+    <value>词典 {0}</value>
+  </data>
+  <data xml:space="preserve" name="Correction">
+    <value>拼写纠错 · {0} 处差异 · </value>
+  </data>
+  <data xml:space="preserve" name="HeadwordCount">
+    <value>{0:N0} 个词头 · {1}</value>
+  </data>
+  <data xml:space="preserve" name="DirectLookup">
+    <value>直接查询：{0}</value>
+  </data>
+  <data xml:space="preserve" name="OpenInGroup">
+    <value>在 GoldenDict-ng 中打开 · {0}</value>
+  </data>
+  <data xml:space="preserve" name="MdxOnly">
+    <value>仅接受 .mdx 文件：{0}</value>
+  </data>
+  <data xml:space="preserve" name="DuplicateDictionary">
+    <value>分组“{0}”中有重复的词典文件。</value>
+  </data>
+  <data xml:space="preserve" name="MdxUnsupportedVersion">
+    <value>暂不支持 MDX {0}；支持 1.x 和 2.x。</value>
+  </data>
+  <data xml:space="preserve" name="MdxCompressionType">
+    <value>未知的 MDX 压缩类型：{0}</value>
+  </data>
+  <data xml:space="preserve" name="CopyGroup">
+    <value>{0} 副本</value>
+  </data>
+  <data xml:space="preserve" name="CliReadHeadwords">
+    <value>读取 {0:N0} 个词头，耗时 {1:F1} ms</value>
+  </data>
+  <data xml:space="preserve" name="CliLoadIndex">
+    <value>索引加载：{0:F1} ms</value>
+  </data>
+  <data xml:space="preserve" name="CliSearch">
+    <value>{0:N0} 个词头；查询：{1:F2} ms</value>
+  </data>
+  <data xml:space="preserve" name="Language">
+    <value>界面语言</value>
+  </data>
+  <data xml:space="preserve" name="SystemLanguage">
+    <value>跟随系统</value>
+  </data>
+  <data xml:space="preserve" name="InvalidLanguage">
+    <value>界面语言必须是 auto、en 或 zh-Hans。</value>
+  </data>
+  <data xml:space="preserve" name="DefaultGroupName">
+    <value>默认</value>
+  </data>
+  <data name="CorrectionSingular" xml:space="preserve">
+    <value>拼写纠错 · {0} 处差异 · </value>
+  </data>
+</root>

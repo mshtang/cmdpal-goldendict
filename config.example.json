@@ -1,0 +1,27 @@
+{
+  "uiLanguage": "auto",
+  "goldenDictPath": "C:\\Program Files\\GoldenDict-ng\\goldendict.exe",
+  "defaultGroup": "英语",
+  "maxResults": 30,
+  "debounceMilliseconds": 60,
+  "fuzzyMatching": true,
+  "maxEditDistance": 2,
+  "ignoreDiacritics": true,
+  "groups": [
+    {
+      "name": "英语",
+      "goldenDictGroup": "English Dictionaries",
+      "dictionaries": [
+        { "name": "英汉词典", "path": "D:\\Dictionaries\\English-Chinese.mdx", "enabled": true },
+        { "name": "英英词典", "path": "D:\\Dictionaries\\English-English.mdx", "enabled": true }
+      ]
+    },
+    {
+      "name": "德语",
+      "goldenDictGroup": "German Dictionaries",
+      "dictionaries": [
+        { "name": "德语词典", "path": "D:\\Dictionaries\\German.mdx", "enabled": true }
+      ]
+    }
+  ]
+}

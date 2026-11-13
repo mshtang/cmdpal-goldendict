@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="AppName" xml:space="preserve"><value>Local Dictionary</value></data>
+  <data name="AppDescription" xml:space="preserve"><value>Offline MDX headword suggestions and GoldenDict-ng lookup</value></data>
+</root>

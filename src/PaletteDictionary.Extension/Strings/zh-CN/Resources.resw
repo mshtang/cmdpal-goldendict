@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="AppName" xml:space="preserve"><value>本地词典</value></data>
+  <data name="AppDescription" xml:space="preserve"><value>离线 MDX 词头候选与 GoldenDict-ng 查词</value></data>
+</root>
