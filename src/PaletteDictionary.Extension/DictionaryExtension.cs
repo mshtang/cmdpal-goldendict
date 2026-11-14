@@ -29,7 +29,6 @@ public sealed partial class DictionaryCommandsProvider : CommandProvider
     private readonly DictionarySearchPage _page;
     private readonly ConfigurationPage _configure;
     private readonly CommandItem[] _commands;
-    private ServiceSnapshot? _languageSnapshot;
     private int _disposed;
     public DictionaryCommandsProvider()
     {
@@ -38,8 +37,8 @@ public sealed partial class DictionaryCommandsProvider : CommandProvider
             ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "PaletteDictionary", "config.json")
             : Path.GetFullPath(overridePath);
         var root = Path.GetDirectoryName(path)!;
-        try { if (File.Exists(path)) UiText.SetLanguage(PluginConfiguration.Load(path).UiLanguage); }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Text.Json.JsonException or InvalidDataException or ArgumentException) { }
+        // Older configurations may contain a manual language override. The UI follows Windows.
+        UiText.SetLanguage("auto");
         _service = new DictionaryService(path, Path.Combine(root, "cache"));
         _configure = new ConfigurationPage(_service, path);
         _page = new DictionarySearchPage(_service, path, _configure);
@@ -54,15 +53,7 @@ public sealed partial class DictionaryCommandsProvider : CommandProvider
             MoreCommands = _page.ContextCommands()
         }, new CommandItem(_configure) { Title = UiText.Get("SettingsTitle"), Subtitle = UiText.Get("SettingsSubtitle") }];
         UiText.LanguageChanged += UpdateLanguage;
-        _service.Changed += OnServiceChanged;
         _service.Start();
-    }
-    private void OnServiceChanged()
-    {
-        var snapshot = _service.Snapshot;
-        if (snapshot is null || ReferenceEquals(snapshot, _languageSnapshot)) return;
-        _languageSnapshot = snapshot;
-        UiText.SetLanguage(snapshot.Configuration.UiLanguage);
     }
     private void UpdateLanguage()
     {
@@ -79,7 +70,7 @@ public sealed partial class DictionaryCommandsProvider : CommandProvider
     public override void Dispose()
     {
         if (Interlocked.Exchange(ref _disposed, 1) != 0) return;
-        UiText.LanguageChanged -= UpdateLanguage; _service.Changed -= OnServiceChanged;
+        UiText.LanguageChanged -= UpdateLanguage;
         _page.Dispose(); _service.Dispose();
     }
 }

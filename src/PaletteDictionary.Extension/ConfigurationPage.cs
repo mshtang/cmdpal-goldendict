@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text;
 using System.Text.Json.Nodes;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
@@ -18,7 +19,9 @@ internal sealed partial class ConfigurationPage : ContentPage
     private readonly string _path;
     private readonly object _sync = new();
     private ConfigurationDocument? _document;
-    private string _messageKey = "PathHint";
+    private string? _messageKey;
+    private string? _conflictMessage;
+    private int _expandedGroup = -1;
     private long _revision;
 
     public ConfigurationPage(DictionaryService service, string path)
@@ -48,13 +51,24 @@ internal sealed partial class ConfigurationPage : ContentPage
 
     private string BuildCard(PluginConfiguration config)
     {
-        var body = new JsonArray
+        var body = new JsonArray();
+        var notice = _conflictMessage ?? _document!.RecoveryNotice ?? (_messageKey is null ? null : UiText.Get(_messageKey));
+        var footerActions = Actions(Action(UiText.Get("AddGroup"), "addGroup"));
+        if (_conflictMessage is not null) footerActions["actions"]!.AsArray().Add(Action(UiText.Get("Reload"), "reload"));
+        var toolbar = Row(AutoColumn(footerActions));
+        if (notice is not null)
         {
-            Note(_document!.RecoveryNotice ?? UiText.Get(_messageKey)),
-            Actions(Action(UiText.Get("Save"), "save"), Action(UiText.Get("AddGroup"), "addGroup"), Action(UiText.Get("Reload"), "reload")),
-            Row(Column(Heading(UiText.Get("BasicSettings"))),
-                Column(Choice("uiLanguage", UiText.Get("Language"), config.UiLanguage,
-                    [(UiText.Get("SystemLanguage"), "auto"), ("English", "en"), ("简体中文", "zh-Hans")]))),
+            var status = Note(notice);
+            status["horizontalAlignment"] = "Right";
+            status["spacing"] = "None";
+            var statusColumn = Column(status);
+            statusColumn["width"] = "stretch";
+            statusColumn["spacing"] = "Large";
+            toolbar["columns"]!.AsArray().Add(statusColumn);
+        }
+        foreach (var column in toolbar["columns"]!.AsArray()) column!["verticalContentAlignment"] = "Center";
+        body.Add(Section("general", UiText.Get("BasicSettings"), new JsonArray
+        {
             TextInput("goldenDictPath", UiText.Get("ProgramPath"), config.GoldenDictPath, UiText.Get("ProgramPathPlaceholder")),
             Row(
                 Column(Choice("defaultGroup", UiText.Get("DefaultGroup"), Math.Max(0, config.Groups.FindIndex(g => g.Name == config.DefaultGroup)).ToString(CultureInfo.InvariantCulture),
@@ -65,22 +79,25 @@ internal sealed partial class ConfigurationPage : ContentPage
                 Column(Toggle("fuzzyMatching", UiText.Get("FuzzyMatching"), config.FuzzyMatching)),
                 Column(Choice("maxEditDistance", UiText.Get("MaxEditDistance"), config.MaxEditDistance.ToString(CultureInfo.InvariantCulture), [("0", "0"), ("1", "1"), ("2", "2")])),
                 Column(Toggle("ignoreDiacritics", UiText.Get("IgnoreDiacritics"), config.IgnoreDiacritics)))
-        };
+        }, expanded: true));
         for (var g = 0; g < config.Groups.Count; g++)
         {
             var group = config.Groups[g]; var items = new JsonArray
             {
-                Row(Column(Heading(UiText.Format("GroupNumber", g + 1))),
-                    AutoColumn(Actions(Action(UiText.Get("AddDictionary"), "addDictionary", g), Action(UiText.Get("RemoveGroup"), "removeGroup", g)))),
                 Row(Column(TextInput($"g{g}_name", UiText.Get("GroupName"), group.Name)),
-                    Column(TextInput($"g{g}_target", UiText.Get("GoldenDictGroup"), group.GoldenDictGroup ?? "")))
+                    Column(TextInput($"g{g}_target", UiText.Get("GoldenDictGroup"), group.GoldenDictGroup ?? ""))),
+                new JsonObject
+                {
+                    ["type"] = "ActionSet", ["spacing"] = "Medium",
+                    ["actions"] = new JsonArray(Action(UiText.Get("AddDictionary"), "addDictionary", g), Action(UiText.Get("RemoveGroup"), "removeGroup", g))
+                }
             };
             for (var d = 0; d < group.Dictionaries.Count; d++)
             {
                 var source = group.Dictionaries[d];
                 items.Add(new JsonObject
                 {
-                    ["type"] = "Container", ["separator"] = true, ["spacing"] = "Small",
+                    ["type"] = "Container", ["separator"] = true, ["spacing"] = "Medium",
                     ["items"] = new JsonArray
                     {
                         Row(Column(new JsonObject { ["type"] = "TextBlock", ["text"] = UiText.Format("DictionaryNumber", d + 1), ["weight"] = "Bolder", ["spacing"] = "None" }),
@@ -91,9 +108,10 @@ internal sealed partial class ConfigurationPage : ContentPage
                     }
                 });
             }
-            body.Add(new JsonObject { ["type"] = "Container", ["separator"] = true, ["spacing"] = "Medium", ["items"] = items });
+            body.Add(Section($"group{g}", string.IsNullOrWhiteSpace(group.Name) ? UiText.Format("GroupNumber", g + 1) : group.Name,
+                items, expanded: g == _expandedGroup));
         }
-        body.Add(Note(UiText.Get("SaveHint")));
+        body.Add(toolbar);
         return new JsonObject
         {
             ["$schema"] = "http://adaptivecards.io/schemas/adaptive-card.json", ["type"] = "AdaptiveCard", ["version"] = "1.5",
@@ -103,7 +121,6 @@ internal sealed partial class ConfigurationPage : ContentPage
 
     private ICommandResult Submit(long revision, string inputs, string data)
     {
-        string? language = null;
         var saved = false;
         lock (_sync)
         {
@@ -114,7 +131,7 @@ internal sealed partial class ConfigurationPage : ContentPage
                 var action = JsonNode.Parse(string.IsNullOrWhiteSpace(data) ? "{}" : data)?.AsObject() ?? new();
                 var operation = Read(action, "operation", Read(values, "operation", "save"));
                 if (operation == "reload")
-                { _document = ConfigurationDocument.Open(_path); _messageKey = "Reloaded"; language = _document.Configuration.UiLanguage; }
+                { _document = ConfigurationDocument.Open(_path); _messageKey = "Reloaded"; _conflictMessage = null; _expandedGroup = -1; }
                 else
                 {
                     _document ??= ConfigurationDocument.Open(_path);
@@ -126,21 +143,33 @@ internal sealed partial class ConfigurationPage : ContentPage
                     {
                         case "save":
                             _document.Save(); _document = ConfigurationDocument.Open(_path);
-                            _messageKey = "SavedHint"; language = config.UiLanguage; saved = true;
+                            _messageKey = "SavedHint"; _conflictMessage = null; saved = true;
                             break;
-                        case "addGroup": new ConfigurationWorkspace(config).AddGroup(); _messageKey = "GroupAdded"; break;
-                        case "addDictionary": config.Groups[groupIndex].Dictionaries.Add(new()); _messageKey = "DictionaryAdded"; break;
-                        case "removeDictionary": config.Groups[groupIndex].Dictionaries.RemoveAt(dictionaryIndex); _messageKey = "DictionaryRemoved"; break;
-                        case "removeGroup": new ConfigurationWorkspace(config).RemoveGroup(config.Groups[groupIndex]); _messageKey = "GroupRemoved"; break;
+                        case "addGroup":
+                            new ConfigurationWorkspace(config).AddGroup(); _expandedGroup = config.Groups.Count - 1; _messageKey = "GroupAdded"; break;
+                        case "addDictionary":
+                            config.Groups[groupIndex].Dictionaries.Add(new()); _expandedGroup = groupIndex; _messageKey = "DictionaryAdded"; break;
+                        case "removeDictionary":
+                            config.Groups[groupIndex].Dictionaries.RemoveAt(dictionaryIndex); _expandedGroup = groupIndex; _messageKey = "DictionaryRemoved"; break;
+                        case "removeGroup":
+                            new ConfigurationWorkspace(config).RemoveGroup(config.Groups[groupIndex]);
+                            if (_expandedGroup == groupIndex) _expandedGroup = -1;
+                            else if (_expandedGroup > groupIndex) _expandedGroup--;
+                            _messageKey = "GroupRemoved"; break;
                         default: throw new InvalidDataException(UiText.Get("UnknownSettingsAction"));
                     }
                 }
                 _revision++;
             }
+            catch (ConfigurationConflictException ex)
+            {
+                // Keep the edited form visible and offer reload only when it is needed.
+                _conflictMessage = ex.Message;
+                _revision++;
+            }
             catch (Exception ex) { return CommandResult.ShowToast(ex.Message); }
         }
-        // Language notifications and COM callbacks must stay outside the form lock.
-        if (language is not null) UiText.SetLanguage(language);
+        // COM callbacks must stay outside the form lock.
         if (saved) _ = _service.ReloadAsync();
         RaiseItemsChanged();
         return saved ? CommandResult.ShowToast(UiText.Get("SettingsSaved")) : CommandResult.KeepOpen();
@@ -150,7 +179,7 @@ internal sealed partial class ConfigurationPage : ContentPage
     {
         var selected = ReadInt(values, "defaultGroup", Math.Max(0, config.Groups.FindIndex(g => g.Name == config.DefaultGroup)));
         config.GoldenDictPath = Read(values, "goldenDictPath", config.GoldenDictPath);
-        config.UiLanguage = Read(values, "uiLanguage", config.UiLanguage);
+        config.UiLanguage = "auto";
         config.MaxResults = ReadInt(values, "maxResults", config.MaxResults);
         config.DebounceMilliseconds = ReadInt(values, "debounceMilliseconds", config.DebounceMilliseconds);
         config.MaxEditDistance = ReadInt(values, "maxEditDistance", config.MaxEditDistance);
@@ -177,7 +206,53 @@ internal sealed partial class ConfigurationPage : ContentPage
         int.TryParse(Read(values, key, ""), NumberStyles.Integer, CultureInfo.InvariantCulture, out var number) ? number : throw new InvalidDataException(UiText.Get("InvalidInteger"));
     private static bool ReadBool(JsonObject values, string key, bool fallback) => !values.ContainsKey(key) ? fallback :
         bool.TryParse(Read(values, key, ""), out var value) ? value : throw new InvalidDataException(UiText.Get("InvalidToggle"));
-    private static JsonObject Heading(string text) => new() { ["type"] = "TextBlock", ["text"] = text, ["weight"] = "Bolder", ["size"] = "Medium", ["wrap"] = true, ["spacing"] = "Small" };
+    private static JsonObject Heading(string text) => new() { ["type"] = "TextBlock", ["text"] = text, ["weight"] = "Bolder", ["wrap"] = true, ["spacing"] = "None" };
+    private static JsonObject Section(string id, string title, JsonArray items, bool expanded)
+    {
+        // Toggle visibility in the renderer so folding a section keeps all unsaved inputs.
+        var down = Chevron(id + "_down", up: false, visible: !expanded);
+        var up = Chevron(id + "_up", up: true, visible: expanded);
+        var arrow = AutoColumn(down); arrow["items"]!.AsArray().Add(up);
+        arrow["width"] = "32px";
+        var row = Row(Column(Heading(title)), arrow);
+        row["spacing"] = "None";
+        foreach (var column in row["columns"]!.AsArray()) column!["verticalContentAlignment"] = "Center";
+        // Let the container center the whole row within the header's minimum height.
+        var header = new JsonObject
+        {
+            // Keep the background and padding inside the selectable header so its
+            // hover target covers the entire strip, including the padded edges.
+            ["type"] = "Container", ["style"] = "emphasis", ["spacing"] = "None", ["minHeight"] = "40px",
+            ["verticalContentAlignment"] = "Center", ["items"] = new JsonArray(row)
+        };
+        header["selectAction"] = new JsonObject
+        {
+            ["type"] = "Action.ToggleVisibility", ["title"] = title,
+            ["targetElements"] = new JsonArray(id + "_content", id + "_down", id + "_up")
+        };
+        return new JsonObject
+        {
+            ["type"] = "Container", ["spacing"] = "Medium",
+            ["items"] = new JsonArray(header, new JsonObject
+            {
+                ["type"] = "Container", ["style"] = "emphasis", ["id"] = id + "_content", ["isVisible"] = expanded,
+                ["separator"] = true, ["spacing"] = "None", ["items"] = items
+            })
+        };
+    }
+    private static JsonObject Chevron(string id, bool up, bool visible)
+    {
+        // Embedded vector geometry avoids font-dependent glyph shape and baseline.
+        // A neutral stroke stays legible on both light and dark card backgrounds.
+        var points = up ? "3,10 8,5 13,10" : "3,6 8,11 13,6";
+        var svg = $"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\"><polyline points=\"{points}\" fill=\"none\" stroke=\"#808080\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>";
+        return new JsonObject
+        {
+            ["type"] = "Image", ["id"] = id, ["isVisible"] = visible, ["spacing"] = "None",
+            ["url"] = "data:image/svg+xml;base64," + Convert.ToBase64String(Encoding.UTF8.GetBytes(svg)),
+            ["width"] = "16px", ["height"] = "16px", ["horizontalAlignment"] = "Center", ["altText"] = ""
+        };
+    }
     private static JsonObject Note(string text) => new() { ["type"] = "TextBlock", ["text"] = text, ["wrap"] = true, ["isSubtle"] = true };
     private static JsonObject TextInput(string id, string label, string value, string placeholder = "") => new()
     { ["type"] = "Input.Text", ["id"] = id, ["label"] = label, ["value"] = value, ["placeholder"] = placeholder, ["spacing"] = "None" };
@@ -195,7 +270,7 @@ internal sealed partial class ConfigurationPage : ContentPage
     private static JsonObject Actions(params JsonObject[] actions) => new()
     { ["type"] = "ActionSet", ["spacing"] = "None", ["actions"] = new JsonArray(actions.Select(a => (JsonNode)a).ToArray()) };
     private static JsonObject Row(params JsonObject[] columns) => new()
-    { ["type"] = "ColumnSet", ["spacing"] = "Small", ["columns"] = new JsonArray(columns.Select(c => (JsonNode)c).ToArray()) };
+    { ["type"] = "ColumnSet", ["spacing"] = "Medium", ["columns"] = new JsonArray(columns.Select(c => (JsonNode)c).ToArray()) };
     private static JsonObject Column(JsonObject item, int width = 1) => new()
     { ["type"] = "Column", ["width"] = width, ["spacing"] = "Small", ["verticalContentAlignment"] = "Bottom", ["items"] = new JsonArray(item) };
     private static JsonObject AutoColumn(JsonObject item)

@@ -39,9 +39,13 @@ The compact settings page lives inside Palette. Manage program paths, dictionary
 
 Paste paths as plain text. Spaces, Unicode, `&`, `#`, square brackets, `/` and `\`, and surrounding quotes are handled without JSON escaping. Saving updates configuration; it does not scan or pre-check dictionary files. Add/remove operations take effect after **Save**.
 
-**Interface language** offers **Follow system**, **English**, and **简体中文**. Save to switch immediately. System mode uses Simplified Chinese for Chinese display languages and English otherwise. User-defined names, paths, and dictionary content remain unchanged.
+General settings and dictionary groups use collapsible sections. Click a section header to expand or collapse it. Newly added groups open automatically.
 
-Configuration: `%LOCALAPPDATA%\PaletteDictionary\config.json`. Headword cache: the adjacent `cache` directory. `config.example.json` documents the schema; `uiLanguage` accepts `auto`, `en`, or `zh-Hans`. Existing configurations remain compatible. Saves are atomic, preserve unknown fields, keep a `.bak`, and detect external edit conflicts.
+**Add group** appears below the last group, with a single **Save** button at the bottom. **Reload** appears only after an external edit conflict; it discards the current draft and reads the configuration file again. Command Palette hosts extension settings inside one shared card and sends form inputs when submitted, so this embedded page uses manual saving.
+
+The interface follows the Windows display language: Simplified Chinese for Chinese display languages and English otherwise. User-defined names, paths, and dictionary content remain unchanged.
+
+Configuration: `%LOCALAPPDATA%\PaletteDictionary\config.json`. Headword cache: the adjacent `cache` directory. `config.example.json` documents the schema. Legacy `uiLanguage` values remain readable; the extension follows the system language and writes `auto` when saving. Saves are atomic, preserve unknown fields, keep a `.bak`, and detect external edit conflicts.
 
 ## Upgrade and uninstall
 

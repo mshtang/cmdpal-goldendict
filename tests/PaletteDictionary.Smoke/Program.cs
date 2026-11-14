@@ -18,7 +18,7 @@ if (args.Length == 1 && args[0] == "--installed")
     if (provider.TopLevelCommands().Length != 2 || provider.GetCommand("PaletteDictionary.Search") is null)
         throw new Exception("Installed extension commands are missing.");
     var form = provider.Settings!.SettingsPage.GetContent().Single().As<IFormContent>();
-    if (!Inputs(form).ContainsKey("uiLanguage")) throw new Exception("Installed settings page is missing.");
+    if (!Inputs(form).ContainsKey("goldenDictPath")) throw new Exception("Installed settings page is missing.");
     Console.WriteLine("PASS installed production CLSID activation and native settings (read only)");
     return 0;
 }
@@ -28,7 +28,7 @@ Directory.CreateDirectory(temporary);
 var testConfigPath = Path.Combine(temporary, "config.json");
 var initial = PluginConfiguration.Load(args[1]);
 initial.UiLanguage = args.Length == 3 ? args[2] : "auto";
-UiText.SetLanguage(initial.UiLanguage);
+UiText.SetLanguage("auto");
 File.WriteAllText(testConfigPath, initial.ToJson());
 var info = new ProcessStartInfo(Path.GetFullPath(args[0])) { UseShellExecute = false, CreateNoWindow = true };
 info.ArgumentList.Add("--smoke-server");
@@ -74,7 +74,8 @@ try
             if (page.GetItems().All(i => i.Title != "apple")) throw new Exception("Prefix search did not update.");
             Console.WriteLine("PASS live dynamic page: typo → prefix");
             TestSettings(provider, testConfigPath);
-            TestLanguages(provider, testConfigPath);
+            TestSystemLanguage(provider, testConfigPath);
+            TestSettingsConflict(provider, testConfigPath);
             extension.As<IDisposable>().Dispose();
             if (!server.WaitForExit(5000)) throw new Exception("COM server did not shut down on Dispose.");
             Console.WriteLine("PASS isolated COM server shutdown");
@@ -89,6 +90,7 @@ static void TestSettings(ICommandProvider provider, string file)
 {
     var settings = provider.Settings?.SettingsPage ?? throw new Exception("Native extension settings entry is missing.");
     var first = settings.GetContent().Single().As<IFormContent>();
+    TestSettingsLayout(first);
     var inputs = Inputs(first);
     var original = PluginConfiguration.Load(file);
     var path = original.Groups[0].Dictionaries[0].Path;
@@ -110,6 +112,7 @@ static void TestSettings(ICommandProvider provider, string file)
     result = form.SubmitForm(Inputs(form).ToJsonString(), "{\"operation\":\"addDictionary\",\"group\":0}");
     if (result.Kind != CommandResultKind.KeepOpen || File.ReadAllText(file) != beforeAdd) throw new Exception("Add must remain unsaved until Save.");
     var added = settings.GetContent().Single().As<IFormContent>();
+    AssertExpanded(added, "group0_content");
     inputs = Inputs(added);
     var missingPath = @"C:/Missing folder/Oxford’s #1 & [test].mdx";
     inputs[$"g0_d{originalCount}_path"] = "\"" + missingPath + "\"";
@@ -132,6 +135,7 @@ static void TestSettings(ICommandProvider provider, string file)
     form.SubmitForm(Inputs(form).ToJsonString(), "{\"operation\":\"addGroup\"}");
     form = settings.GetContent().Single().As<IFormContent>(); inputs = Inputs(form);
     var groupIndex = saved.Groups.Count;
+    AssertExpanded(form, $"group{groupIndex}_content");
     inputs[$"g{groupIndex}_name"] = "第二分组"; inputs["defaultGroup"] = groupIndex.ToString();
     form.SubmitForm(inputs.ToJsonString(), "{\"operation\":\"save\"}");
     if (PluginConfiguration.Load(file).DefaultGroup != "第二分组") throw new Exception("Added group did not become the default.");
@@ -146,44 +150,83 @@ static JsonObject Inputs(IFormContent form)
             result[id.ToString()] = node["value"]?.DeepClone();
     return result;
 }
-static void TestLanguages(ICommandProvider provider, string file)
+static void TestSettingsLayout(IFormContent form)
+{
+    var card = JsonNode.Parse(form.TemplateJson)!;
+    var nodes = Walk(card).ToArray();
+    if (nodes.Count(n => n["data"]?["operation"]?.ToString() == "save") != 1)
+        throw new Exception("Settings must contain only one Save button.");
+    if (nodes.Any(n => n["data"]?["operation"]?.ToString() == "reload"))
+        throw new Exception("Reload should only be offered for an external edit conflict.");
+    if (!Walk(card["body"]!.AsArray().Last()!).Any(n => n["data"]?["operation"]?.ToString() == "addGroup"))
+        throw new Exception("Add group must follow the last group.");
+    var ids = nodes.Where(n => n["id"] is not null).Select(n => n["id"]!.ToString()).ToArray();
+    if (ids.Length != ids.Distinct().Count()) throw new Exception("Settings element IDs must be unique.");
+    if (ids.Contains("uiLanguage") || nodes.Any(n => n["text"]?.ToString() == UiText.Get("PathHint")))
+        throw new Exception("Removed language selector or path hint is still visible.");
+    var sections = card["body"]!.AsArray().OfType<JsonObject>().Where(n => n["items"]?[0]?["selectAction"] is not null).ToArray();
+    if (sections.Length != Inputs(form).Count(p => p.Key.EndsWith("_target", StringComparison.Ordinal)) + 1)
+        throw new Exception("General and dictionary groups must share the same section style.");
+    foreach (var section in sections)
+    {
+        var action = section["items"]![0]!["selectAction"]!;
+        if (action["type"]?.ToString() != "Action.ToggleVisibility") throw new Exception("Section header is not collapsible.");
+        var targets = action["targetElements"]!.AsArray().Select(n => n!.ToString()).ToArray();
+        if (targets.Length != 3 || targets.Any(id => !ids.Contains(id))) throw new Exception("Invalid section toggle targets.");
+        var content = nodes.Single(n => n["id"]?.ToString() == targets[0]);
+        var down = nodes.Single(n => n["id"]?.ToString() == targets[1]);
+        var up = nodes.Single(n => n["id"]?.ToString() == targets[2]);
+        var expanded = content["isVisible"]!.GetValue<bool>();
+        if (expanded != (targets[0] == "general_content") || down["isVisible"]!.GetValue<bool>() == expanded || up["isVisible"]!.GetValue<bool>() != expanded)
+            throw new Exception("Initial section visibility and chevrons disagree.");
+    }
+    Console.WriteLine("PASS native settings: consistent collapsible sections, valid targets and no language selector/path hint");
+}
+static void AssertExpanded(IFormContent form, string id)
+{
+    var content = Walk(JsonNode.Parse(form.TemplateJson)!).Single(n => n["id"]?.ToString() == id);
+    if (content["isVisible"]?.GetValue<bool>() != true) throw new Exception("Edited group should stay expanded.");
+}
+static void TestSettingsConflict(ICommandProvider provider, string file)
+{
+    var settings = provider.Settings!.SettingsPage;
+    var form = settings.GetContent().Single().As<IFormContent>();
+    var external = PluginConfiguration.Load(file);
+    external.MaxResults = 42;
+    File.WriteAllText(file, external.ToJson());
+    var snapshot = File.ReadAllText(file);
+    var inputs = Inputs(form); inputs["maxResults"] = 17;
+    var result = form.SubmitForm(inputs.ToJsonString(), "{\"operation\":\"save\"}");
+    if (result.Kind != CommandResultKind.KeepOpen || File.ReadAllText(file) != snapshot)
+        throw new Exception("Conflicting save must keep the page open and preserve external changes.");
+    form = settings.GetContent().Single().As<IFormContent>();
+    if (!Walk(JsonNode.Parse(form.TemplateJson)!).Any(n => n["data"]?["operation"]?.ToString() == "reload") || Inputs(form)["maxResults"]?.ToString() != "17")
+        throw new Exception("Conflict must preserve the draft and offer Reload.");
+    form.SubmitForm("{}", "{\"operation\":\"reload\"}");
+    form = settings.GetContent().Single().As<IFormContent>();
+    if (Inputs(form)["maxResults"]?.ToString() != "42" || Walk(JsonNode.Parse(form.TemplateJson)!).Any(n => n["data"]?["operation"]?.ToString() == "reload"))
+        throw new Exception("Reload must restore external values and hide the recovery action.");
+    Console.WriteLine("PASS native settings: conflict preserves file/draft and offers Reload only until recovery");
+}
+static void TestSystemLanguage(ICommandProvider provider, string file)
 {
     var settings = provider.Settings!.SettingsPage;
     var names = PluginConfiguration.Load(file).Groups.Select(g => g.Name).ToArray();
-    foreach (var language in new[] { "en", "zh-Hans", "auto", "en" })
+    var expectedTitle = UiText.Get("SettingsTitle");
+    foreach (var language in new[] { "en", "zh-Hans", "auto" })
     {
         var form = settings.GetContent().Single().As<IFormContent>();
-        var values = Inputs(form); values["uiLanguage"] = language; values["fuzzyMatching"] = "true";
+        var values = Inputs(form); values["uiLanguage"] = language;
         form.SubmitForm(values.ToJsonString(), "{\"operation\":\"save\"}");
-        UiText.SetLanguage(language);
-        var expectedTitle = UiText.Culture.Name == "zh" ? "本地词典设置" : "Local Dictionary Settings";
         if (provider.TopLevelCommands()[1].Title != expectedTitle || settings.Title != expectedTitle)
-            throw new Exception("Page/command titles did not update after a language change.");
+            throw new Exception("UI must keep following the system language.");
         var saved = PluginConfiguration.Load(file);
-        if (saved.UiLanguage != language || !saved.Groups.Select(g => g.Name).SequenceEqual(names))
-            throw new Exception("Language selection was not persisted or changed user-defined names.");
-        form = settings.GetContent().Single().As<IFormContent>();
-        var nodes = Walk(JsonNode.Parse(form.TemplateJson)!).ToArray();
-        var selector = nodes.Single(n => n["id"]?.ToString() == "uiLanguage");
-        if (selector["label"]?.ToString() != UiText.Get("Language")) throw new Exception("Language label did not switch.");
-        if (UiText.Culture.Name == "en")
-            foreach (var node in nodes)
-            {
-                var type = node["type"]?.ToString() ?? "";
-                var keys = type.StartsWith("Input.", StringComparison.Ordinal) ? new[] { "label", "title", "placeholder" } :
-                    type is "TextBlock" or "Action.Submit" ? new[] { "text", "title" } : [];
-                foreach (var key in keys)
-                    if (node[key]?.ToString().Any(c => c is >= '\u4e00' and <= '\u9fff') == true)
-                        throw new Exception("Untranslated English UI text: " + node[key]);
-            }
-        var page = provider.TopLevelCommands()[0].Command.As<IDynamicListPage>();
-        page.SearchText = "aple";
-        var expectedCorrection = UiText.Correction(1);
-        for (var wait = 0; wait < 100 && page.GetItems().All(i => i.Title != "apple" || !i.Subtitle.StartsWith(expectedCorrection, StringComparison.Ordinal)); wait++) Thread.Sleep(100);
-        if (page.GetItems().All(i => i.Title != "apple" || !i.Subtitle.StartsWith(expectedCorrection, StringComparison.Ordinal)))
-            throw new Exception("Suggestion language did not change without restarting.");
-        Console.WriteLine($"PASS language switch: {language}; titles, form, candidates and user names");
+        if (saved.UiLanguage != "auto" || !saved.Groups.Select(g => g.Name).SequenceEqual(names))
+            throw new Exception("Saving must reset legacy language overrides without changing user-defined names.");
+        if (Inputs(settings.GetContent().Single().As<IFormContent>()).ContainsKey("uiLanguage"))
+            throw new Exception("Language selector should be removed.");
     }
+    Console.WriteLine("PASS system language: legacy overrides ignored, saves use auto and user names preserved");
 }
 static IEnumerable<JsonObject> Walk(JsonNode node)
 {
