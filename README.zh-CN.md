@@ -10,7 +10,7 @@ PowerToys Command Palette 的离线 MDX 词头候选扩展。输入时在插件�
 
 1. 准备 Windows 11 x64、Command Palette 和 GoldenDict-ng，并先在 GoldenDict-ng 配好词典。
 2. 从 [Releases](https://github.com/mshtang/cmdpal-goldendict/releases) 下载 `CmdPal-GoldenDict-2.2.0-dev-Setup-x64.exe`，双击安装。无需另装 .NET 运行时；开发版未签名，Windows 可能提示未知发布者或 SmartScreen。
-3. 在 Palette 运行 **Reload**，打开「本地词典设置 / Local Dictionary Settings」，粘贴程序和 MDX 路径，保存即可。
+3. 在 Palette 运行 **Reload**，打开「本地词典 / Local Dictionary」，从上下文菜单进入设置，粘贴程序和 MDX 路径，保存即可。
 
 以后运行新版安装器即可覆盖升级，已有配置与缓存会保留；降级会被阻止。卸载时在 Windows 已安装的应用中选择 **CmdPal GoldenDict (Development installer)**，安装器会注销扩展并清理程序文件，保留用户配置与缓存，不影响 GoldenDict-ng 或原始词典。
 
@@ -56,13 +56,13 @@ PowerToys Command Palette 的离线 MDX 词头候选扩展。输入时在插件�
 
 ## 配置
 
-在 Palette 中搜索 **本地词典设置**，或者从扩展的设置入口、查词页上下文菜单进入同一个原生设置页。
+从扩展的设置入口或查词页上下文菜单进入原生设置页。
 
 基本设置与各个词典分组采用统一的折叠卡片，点击标题栏即可展开或收起；新增分组会自动展开。
 
 默认分组可以选择「全部」，合并所有分组中已启用词典的候选；以「全部」查词时，打开释义会沿用 GoldenDict-ng 当前的分组。
 
-英文界面的命令名称为 **Local Dictionary** 和 **Local Dictionary Settings**。界面始终跟随 Windows 显示语言：中文使用简体中文，其余语言使用英文。系统管理的包名称跟随 Windows 语言。
+英文界面的查词命令名称为 **Local Dictionary**，设置页标题为 **Local Dictionary Settings**。界面始终跟随 Windows 显示语言：中文使用简体中文，其余语言使用英文。系统管理的包名称跟随 Windows 语言。
 
 词典条目、词典名称、分组名称、文件路径和 GoldenDict 分组名称属于用户内容，系统语言不会翻译或重命名这些内容。旧配置中的手动语言选项仍可读取，但界面会跟随系统，保存时会写为 `auto`。
 

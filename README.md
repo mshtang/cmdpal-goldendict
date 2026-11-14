@@ -13,7 +13,7 @@ Type a word, choose a suggestion, and press Enter. GoldenDict-ng renders the dic
 1. Install Command Palette and GoldenDict-ng, and configure your dictionaries in GoldenDict-ng.
 2. On Windows 11 x64, download [CmdPal-GoldenDict-2.2.0-dev-Setup-x64.exe](https://github.com/mshtang/cmdpal-goldendict/releases/download/v2.2.0/CmdPal-GoldenDict-2.2.0-dev-Setup-x64.exe).
 3. With Windows Developer Mode already enabled, double-click the installer and complete the wizard. The development installer is unsigned; Windows may show an unknown-publisher or SmartScreen prompt.
-4. Run **Reload** in Command Palette, then open **Local Dictionary Settings**.
+4. Run **Reload** in Command Palette, then open **Local Dictionary** and access settings from its context menu.
 5. Paste your GoldenDict-ng executable path and add the MDX dictionaries used for suggestions. Save.
 
 The installer includes the .NET runtime and installs for the current user. It does not include GoldenDict-ng or dictionary files. English and Simplified Chinese installation/UI languages are supported.
@@ -35,7 +35,7 @@ Use Palette's own command settings to assign an alias or global shortcut. The ex
 
 ## Settings
 
-The compact settings page lives inside Palette. Manage program paths, dictionary paths/names/enabled state, groups, suggestion limits, spelling corrections, accent matching, and typing delay.
+The compact settings page lives inside Palette. Open it from the extension settings entry or the Local Dictionary context menu. Manage program paths, dictionary paths/names/enabled state, groups, suggestion limits, spelling corrections, accent matching, and typing delay.
 
 Paste paths as plain text. Spaces, Unicode, `&`, `#`, square brackets, `/` and `\`, and surrounding quotes are handled without JSON escaping. Saving updates configuration; it does not scan or pre-check dictionary files. Add/remove operations take effect after **Save**.
 

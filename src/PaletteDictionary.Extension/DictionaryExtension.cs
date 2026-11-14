@@ -51,7 +51,7 @@ public sealed partial class DictionaryCommandsProvider : CommandProvider
         {
             Title = UiText.Get("AppName"), Subtitle = UiText.Get("ExtensionSubtitle"),
             MoreCommands = _page.ContextCommands()
-        }, new CommandItem(_configure) { Title = UiText.Get("SettingsTitle"), Subtitle = UiText.Get("SettingsSubtitle") }];
+        }];
         UiText.LanguageChanged += UpdateLanguage;
         _service.Start();
     }
@@ -60,13 +60,12 @@ public sealed partial class DictionaryCommandsProvider : CommandProvider
         if (Volatile.Read(ref _disposed) != 0) return;
         DisplayName = UiText.Get("AppName");
         _commands[0].Title = UiText.Get("AppName"); _commands[0].Subtitle = UiText.Get("ExtensionSubtitle");
-        _commands[1].Title = UiText.Get("SettingsTitle"); _commands[1].Subtitle = UiText.Get("SettingsSubtitle");
         _page.UpdateLanguage(); _configure.UpdateLanguage();
         RaiseItemsChanged();
     }
     public override ICommandItem[] TopLevelCommands() => _commands;
     public override ICommand? GetCommand(string id) => id == _page.Id ? _page : id == _configure.Id ? _configure : null;
-    public override ICommandItem? GetCommandItem(string id) => id == _page.Id ? _commands[0] : id == _configure.Id ? _commands[1] : null;
+    public override ICommandItem? GetCommandItem(string id) => id == _page.Id ? _commands[0] : null;
     public override void Dispose()
     {
         if (Interlocked.Exchange(ref _disposed, 1) != 0) return;

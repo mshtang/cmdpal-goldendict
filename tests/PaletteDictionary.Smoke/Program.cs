@@ -15,7 +15,7 @@ if (args.Length == 1 && args[0] == "--installed")
     try { installed = MarshalInspectable<IExtension>.FromAbi(pointer); }
     finally { Marshal.Release(pointer); }
     var provider = installed.GetProvider(ProviderType.Commands).As<ICommandProvider>();
-    if (provider.TopLevelCommands().Length != 2 || provider.GetCommand("PaletteDictionary.Search") is null)
+    if (provider.TopLevelCommands().Length != 1 || provider.GetCommand("PaletteDictionary.Search") is null)
         throw new Exception("Installed extension commands are missing.");
     var form = provider.Settings!.SettingsPage.GetContent().Single().As<IFormContent>();
     if (!Inputs(form).ContainsKey("goldenDictPath")) throw new Exception("Installed settings page is missing.");
@@ -55,7 +55,7 @@ try
     if (extension is null) Marshal.ThrowExceptionForHR(lastResult);
     var provider = extension!.GetProvider(ProviderType.Commands).As<ICommandProvider>();
     var top = provider.TopLevelCommands();
-    if (top.Length != 2 || top[0].Title != UiText.Get("AppName") || top[1].Title != UiText.Get("SettingsTitle")) throw new Exception("Unexpected top-level commands.");
+    if (top.Length != 1 || top[0].Title != UiText.Get("AppName")) throw new Exception("Unexpected top-level commands.");
     if (top[0].MoreCommands.Length < 2) throw new Exception("Context menu did not marshal.");
     var page = top[0].Command.As<IDynamicListPage>();
     for (var attempt = 0; attempt < 200; attempt++)
@@ -261,7 +261,7 @@ static void TestSystemLanguage(ICommandProvider provider, string file)
         var form = settings.GetContent().Single().As<IFormContent>();
         var values = Inputs(form); values["uiLanguage"] = language;
         form.SubmitForm(values.ToJsonString(), "{\"operation\":\"save\"}");
-        if (provider.TopLevelCommands()[1].Title != expectedTitle || settings.Title != expectedTitle)
+        if (provider.TopLevelCommands().Single().Title != UiText.Get("AppName") || settings.Title != expectedTitle)
             throw new Exception("UI must keep following the system language.");
         var saved = PluginConfiguration.Load(file);
         if (saved.UiLanguage != "auto" || !saved.Groups.Select(g => g.Name).SequenceEqual(names))
