@@ -72,6 +72,13 @@ public sealed class DictionaryService : IDisposable
             var words = group.Dictionaries.Where(s => s.Enabled).SelectMany(s => wordsByPath[s.Path].Select(w => new WordSource(w, s.Name)));
             groups.Add(group.Name, new(group, new HeadwordIndex(words, config.IgnoreDiacritics, token)));
         }
+        var allSources = config.Groups.SelectMany(g => g.Dictionaries).Where(s => s.Enabled).ToList();
+        var allIndex = config.Groups.Count == 1 ? groups[config.Groups[0].Name].Index :
+            new HeadwordIndex(allSources.SelectMany(s => wordsByPath[s.Path].Select(w => new WordSource(w, s.Name))), config.IgnoreDiacritics, token);
+        groups.Add(PluginConfiguration.AllGroupsId, new(new DictionaryGroup
+        {
+            Name = UiText.Get("AllGroups"), Dictionaries = allSources
+        }, allIndex));
         token.ThrowIfCancellationRequested();
         if (File.GetLastWriteTimeUtc(_configurationPath) != configTime) throw new IOException(UiText.Get("ConfigurationChangedDuringBuild"));
         _stamps = stamps; _configTime = configTime;

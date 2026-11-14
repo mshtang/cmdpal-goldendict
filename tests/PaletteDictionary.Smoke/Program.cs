@@ -76,6 +76,7 @@ try
             TestSettings(provider, testConfigPath);
             TestSystemLanguage(provider, testConfigPath);
             TestSettingsConflict(provider, testConfigPath);
+            TestAllGroups(provider, testConfigPath);
             extension.As<IDisposable>().Dispose();
             if (!server.WaitForExit(5000)) throw new Exception("COM server did not shut down on Dispose.");
             Console.WriteLine("PASS isolated COM server shutdown");
@@ -98,6 +99,7 @@ static void TestSettings(ICommandProvider provider, string file)
     inputs["g0_d0_path"] = "“" + path.Replace('\\', '/') + "”";
     inputs["g0_d0_name"] = "Oxford’s [中文] & #1";
     inputs["g0_name"] = "原生设置测试";
+    inputs["defaultGroup"] = "0";
     inputs["maxResults"] = 23; inputs["fuzzyMatching"] = "false";
     var result = first.SubmitForm(inputs.ToJsonString(), "{\"operation\":\"save\"}");
     if (result.Kind != CommandResultKind.ShowToast) throw new Exception("Form save did not return a result.");
@@ -207,6 +209,47 @@ static void TestSettingsConflict(ICommandProvider provider, string file)
     if (Inputs(form)["maxResults"]?.ToString() != "42" || Walk(JsonNode.Parse(form.TemplateJson)!).Any(n => n["data"]?["operation"]?.ToString() == "reload"))
         throw new Exception("Reload must restore external values and hide the recovery action.");
     Console.WriteLine("PASS native settings: conflict preserves file/draft and offers Reload only until recovery");
+}
+static void TestAllGroups(ICommandProvider provider, string file)
+{
+    var settings = provider.Settings!.SettingsPage;
+    var form = settings.GetContent().Single().As<IFormContent>();
+    var config = PluginConfiguration.Load(file);
+    var second = config.Groups.Count - 1;
+    form.SubmitForm(Inputs(form).ToJsonString(), $"{{\"operation\":\"addDictionary\",\"group\":{second}}}");
+    form = settings.GetContent().Single().As<IFormContent>();
+    var inputs = Inputs(form);
+    var dictionary = config.Groups[second].Dictionaries.Count;
+    inputs[$"g{second}_d{dictionary}_path"] = config.Groups[0].Dictionaries[0].Path;
+    inputs[$"g{second}_d{dictionary}_name"] = "Secondary source";
+    inputs["defaultGroup"] = "-1";
+    form.SubmitForm(inputs.ToJsonString(), "{\"operation\":\"save\"}");
+    if (PluginConfiguration.Load(file).DefaultGroup != PluginConfiguration.AllGroupsId || Inputs(settings.GetContent().Single().As<IFormContent>())["defaultGroup"]?.ToString() != "-1")
+        throw new Exception("All must round-trip through the settings form and configuration.");
+    var page = provider.TopLevelCommands()[0].Command.As<IDynamicListPage>();
+    WaitFor(() => page.Filters?.CurrentFilterId == PluginConfiguration.AllGroupsId, "Saving All did not update the active search filter.");
+    if (page.Filters!.GetFilters().Length != config.Groups.Count + 1) throw new Exception("All filter is missing.");
+    page.SearchText = "apple";
+    WaitFor(() => page.GetItems().Any(i => i.Title == "apple" && i.Subtitle.Contains("Secondary source") && i.Subtitle.Contains("Oxford’s")), "All did not merge dictionary sources across groups.");
+    page.Filters.CurrentFilterId = config.Groups[second].Name;
+    WaitFor(() => page.GetItems().Any(i => i.Title == "apple" && i.Subtitle.Contains("Secondary source") && !i.Subtitle.Contains("Oxford’s")), "Individual group filtering stopped working.");
+    foreach (var selected in new[] { "0", "-1" })
+    {
+        form = settings.GetContent().Single().As<IFormContent>(); inputs = Inputs(form); inputs["defaultGroup"] = selected;
+        form.SubmitForm(inputs.ToJsonString(), "{\"operation\":\"save\"}");
+        var expected = selected == "-1" ? PluginConfiguration.AllGroupsId : config.Groups[0].Name;
+        WaitFor(() => page.Filters?.CurrentFilterId == expected, "Changed default group was not applied to search.");
+    }
+    Console.WriteLine("PASS All groups: form persistence, combined search, individual filtering and live default changes");
+}
+static void WaitFor(Func<bool> condition, string failure)
+{
+    for (var attempt = 0; attempt < 100; attempt++)
+    {
+        if (condition()) return;
+        Thread.Sleep(100);
+    }
+    throw new Exception(failure);
 }
 static void TestSystemLanguage(ICommandProvider provider, string file)
 {

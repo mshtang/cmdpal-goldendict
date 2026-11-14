@@ -71,14 +71,14 @@ internal sealed partial class ConfigurationPage : ContentPage
         {
             TextInput("goldenDictPath", UiText.Get("ProgramPath"), config.GoldenDictPath, UiText.Get("ProgramPathPlaceholder")),
             Row(
-                Column(Choice("defaultGroup", UiText.Get("DefaultGroup"), Math.Max(0, config.Groups.FindIndex(g => g.Name == config.DefaultGroup)).ToString(CultureInfo.InvariantCulture),
-                    config.Groups.Select((g, i) => (g.Name, i.ToString(CultureInfo.InvariantCulture))))),
-                Column(NumberInput("maxResults", UiText.Get("MaxResults"), config.MaxResults, 1, 100)),
-                Column(NumberInput("debounceMilliseconds", UiText.Get("Debounce"), config.DebounceMilliseconds, 0, 1000))),
-            Row(
+                Column(Choice("defaultGroup", UiText.Get("DefaultGroup"), config.Groups.FindIndex(g => g.Name == config.DefaultGroup).ToString(CultureInfo.InvariantCulture),
+                    config.Groups.Select((g, i) => (g.Name, i.ToString(CultureInfo.InvariantCulture))).Prepend((UiText.Get("AllGroups"), "-1")))),
                 Column(Toggle("fuzzyMatching", UiText.Get("FuzzyMatching"), config.FuzzyMatching)),
+                Column(Toggle("ignoreDiacritics", UiText.Get("IgnoreDiacritics"), config.IgnoreDiacritics))),
+            Row(
+                Column(NumberInput("maxResults", UiText.Get("MaxResults"), config.MaxResults, 1, 100)),
                 Column(Choice("maxEditDistance", UiText.Get("MaxEditDistance"), config.MaxEditDistance.ToString(CultureInfo.InvariantCulture), [("0", "0"), ("1", "1"), ("2", "2")])),
-                Column(Toggle("ignoreDiacritics", UiText.Get("IgnoreDiacritics"), config.IgnoreDiacritics)))
+                Column(NumberInput("debounceMilliseconds", UiText.Get("Debounce"), config.DebounceMilliseconds, 0, 1000)))
         }, expanded: true));
         for (var g = 0; g < config.Groups.Count; g++)
         {
@@ -177,7 +177,7 @@ internal sealed partial class ConfigurationPage : ContentPage
 
     private static void ApplyInputs(PluginConfiguration config, JsonObject values)
     {
-        var selected = ReadInt(values, "defaultGroup", Math.Max(0, config.Groups.FindIndex(g => g.Name == config.DefaultGroup)));
+        var selected = ReadInt(values, "defaultGroup", config.Groups.FindIndex(g => g.Name == config.DefaultGroup));
         config.GoldenDictPath = Read(values, "goldenDictPath", config.GoldenDictPath);
         config.UiLanguage = "auto";
         config.MaxResults = ReadInt(values, "maxResults", config.MaxResults);
@@ -197,8 +197,8 @@ internal sealed partial class ConfigurationPage : ContentPage
                 source.Enabled = ReadBool(values, $"g{g}_d{d}_enabled", source.Enabled);
             }
         }
-        if (selected < 0 || selected >= config.Groups.Count) throw new InvalidDataException(UiText.Get("SelectDefaultGroup"));
-        config.DefaultGroup = config.Groups[selected].Name;
+        if (selected < -1 || selected >= config.Groups.Count) throw new InvalidDataException(UiText.Get("SelectDefaultGroup"));
+        config.DefaultGroup = selected == -1 ? PluginConfiguration.AllGroupsId : config.Groups[selected].Name;
     }
 
     private static string Read(JsonObject values, string key, string fallback) => values.TryGetPropertyValue(key, out var value) && value is not null ? value.ToString() : fallback;

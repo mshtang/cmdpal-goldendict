@@ -41,6 +41,8 @@ Paste paths as plain text. Spaces, Unicode, `&`, `#`, square brackets, `/` and `
 
 General settings and dictionary groups use collapsible sections. Click a section header to expand or collapse it. Newly added groups open automatically.
 
+The default group can be **All**, which merges suggestions from enabled dictionaries across all groups. Selecting All leaves GoldenDict-ng's current group unchanged when opening a definition. In `config.json`, use `"defaultGroup": ""` for All, or a configured group name.
+
 **Add group** appears below the last group, with a single **Save** button at the bottom. **Reload** appears only after an external edit conflict; it discards the current draft and reads the configuration file again. Command Palette hosts extension settings inside one shared card and sends form inputs when submitted, so this embedded page uses manual saving.
 
 The interface follows the Windows display language: Simplified Chinese for Chinese display languages and English otherwise. User-defined names, paths, and dictionary content remain unchanged.

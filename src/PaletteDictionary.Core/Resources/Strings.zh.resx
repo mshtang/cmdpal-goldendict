@@ -78,6 +78,9 @@
   <data xml:space="preserve" name="DefaultGroup">
     <value>默认分组</value>
   </data>
+  <data xml:space="preserve" name="AllGroups">
+    <value>全部</value>
+  </data>
   <data xml:space="preserve" name="MaxResults">
     <value>候选数量</value>
   </data>
@@ -232,7 +235,7 @@
     <value>分组名称不能重复。</value>
   </data>
   <data xml:space="preserve" name="InvalidDefaultGroup">
-    <value>defaultGroup 必须对应一个已配置分组。</value>
+    <value>defaultGroup 必须对应一个已配置分组，或留空表示全部。</value>
   </data>
   <data xml:space="preserve" name="InvalidSearchOptions">
     <value>maxResults 应为 1–100，debounceMilliseconds 为 0–1000，maxEditDistance 为 0–2。</value>

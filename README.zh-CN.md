@@ -60,6 +60,8 @@ PowerToys Command Palette 的离线 MDX 词头候选扩展。输入时在插件�
 
 基本设置与各个词典分组采用统一的折叠卡片，点击标题栏即可展开或收起；新增分组会自动展开。
 
+默认分组可以选择「全部」，合并所有分组中已启用词典的候选；以「全部」查词时，打开释义会沿用 GoldenDict-ng 当前的分组。
+
 英文界面的命令名称为 **Local Dictionary** 和 **Local Dictionary Settings**。界面始终跟随 Windows 显示语言：中文使用简体中文，其余语言使用英文。系统管理的包名称跟随 Windows 语言。
 
 词典条目、词典名称、分组名称、文件路径和 GoldenDict 分组名称属于用户内容，系统语言不会翻译或重命名这些内容。旧配置中的手动语言选项仍可读取，但界面会跟随系统，保存时会写为 `auto`。
@@ -89,7 +91,7 @@ Command Palette 会将内嵌设置放在一个共享外层卡片中，并在提�
 | --- | --- |
 | `uiLanguage` | 兼容旧配置；界面始终跟随系统，保存时写为 `auto` |
 | `goldenDictPath` | GoldenDict-ng 的完整 exe 路径 |
-| `defaultGroup` | 默认插件分组，必须与某个 `groups[].name` 一致 |
+| `defaultGroup` | 默认插件分组：与某个 `groups[].name` 一致，或用空字符串 `""` 表示全部 |
 | `maxResults` | 候选数量上限，1–100；另可显示一条直接查询操作 |
 | `debounceMilliseconds` | 输入防抖，默认 60 ms |
 | `fuzzyMatching` | 是否补充拼写纠错候选 |

@@ -78,6 +78,9 @@
   <data xml:space="preserve" name="DefaultGroup">
     <value>Default group</value>
   </data>
+  <data xml:space="preserve" name="AllGroups">
+    <value>All</value>
+  </data>
   <data xml:space="preserve" name="MaxResults">
     <value>Suggestion limit</value>
   </data>
@@ -232,7 +235,7 @@
     <value>Group names must be unique.</value>
   </data>
   <data xml:space="preserve" name="InvalidDefaultGroup">
-    <value>defaultGroup must match a configured group.</value>
+    <value>defaultGroup must match a configured group, or be empty for All.</value>
   </data>
   <data xml:space="preserve" name="InvalidSearchOptions">
     <value>maxResults must be 1–100, debounceMilliseconds 0–1000, and maxEditDistance 0–2.</value>

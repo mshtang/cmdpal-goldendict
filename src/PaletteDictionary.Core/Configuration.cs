@@ -21,6 +21,8 @@ public sealed class DictionaryGroup
 
 public sealed class PluginConfiguration
 {
+    // Group names cannot be empty, so this ID cannot collide with a user-defined group.
+    public const string AllGroupsId = "";
     public string UiLanguage { get; set; } = "auto";
     public string GoldenDictPath { get; set; } = "";
     public string DefaultGroup { get; set; } = "默认";
@@ -63,7 +65,7 @@ public sealed class PluginConfiguration
             throw new InvalidDataException(UiText.Get("InvalidGroup"));
         if (config.Groups.Select(g => g.Name).Distinct(StringComparer.Ordinal).Count() != config.Groups.Count)
             throw new InvalidDataException(UiText.Get("DuplicateGroup"));
-        if (!config.Groups.Any(g => g.Name == config.DefaultGroup))
+        if (config.DefaultGroup != AllGroupsId && !config.Groups.Any(g => g.Name == config.DefaultGroup))
             throw new InvalidDataException(UiText.Get("InvalidDefaultGroup"));
         if (config.MaxResults is < 1 or > 100 || config.DebounceMilliseconds is < 0 or > 1000 || config.MaxEditDistance is < 0 or > 2)
             throw new InvalidDataException(UiText.Get("InvalidSearchOptions"));

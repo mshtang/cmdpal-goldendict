@@ -15,6 +15,7 @@ internal sealed partial class DictionarySearchPage : DynamicListPage, IDisposabl
     private string _query = "";
     private string _groupId = "";
     private string _filterSignature = "";
+    private string? _defaultGroup;
     private long _generation;
     private bool _disposed;
 
@@ -53,9 +54,11 @@ internal sealed partial class DictionarySearchPage : DynamicListPage, IDisposabl
             var snapshot = _service.Snapshot;
             if (snapshot is not null)
             {
-                if (!snapshot.Groups.ContainsKey(_groupId)) _groupId = snapshot.Configuration.DefaultGroup;
+                var defaultChanged = _defaultGroup != snapshot.Configuration.DefaultGroup;
+                if (defaultChanged || !snapshot.Groups.ContainsKey(_groupId)) _groupId = snapshot.Configuration.DefaultGroup;
+                _defaultGroup = snapshot.Configuration.DefaultGroup;
                 var signature = string.Join('\0', snapshot.Groups.Keys);
-                if (signature != _filterSignature)
+                if (signature != _filterSignature || defaultChanged)
                 {
                     var filters = new GroupFilters(snapshot.Groups.Keys.ToArray(), _groupId);
                     filters.PropChanged += (_, args) =>
@@ -171,7 +174,8 @@ internal sealed partial class GroupFilters : Filters
     private readonly IFilterItem[] _filters;
     public GroupFilters(string[] names, string selected)
     {
-        _filters = names.Select(name => (IFilterItem)new Filter { Id = name, Name = name }).ToArray();
+        _filters = names.OrderBy(name => name != PluginConfiguration.AllGroupsId)
+            .Select(name => (IFilterItem)new Filter { Id = name, Name = name == PluginConfiguration.AllGroupsId ? UiText.Get("AllGroups") : name }).ToArray();
         CurrentFilterId = selected;
     }
     public override IFilterItem[] GetFilters() => _filters;

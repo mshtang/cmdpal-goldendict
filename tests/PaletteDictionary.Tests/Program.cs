@@ -301,6 +301,53 @@ try
         service.ReloadAsync().GetAwaiter().GetResult();
         Check(service.Snapshot!.Groups[document.Configuration.DefaultGroup].Index.Count == 0);
     });
+    Test("All groups: configuration persistence and group edits preserve the default", () =>
+    {
+        var document = Editable("all-default");
+        var model = new ConfigurationWorkspace(document.Configuration);
+        var first = document.Configuration.Groups[0]; model.DuplicateGroup(first);
+        document.Configuration.DefaultGroup = PluginConfiguration.AllGroupsId;
+        document.Save();
+        Check(PluginConfiguration.Load(document.FilePath).DefaultGroup == PluginConfiguration.AllGroupsId);
+        model.RenameGroup(first, "All"); // This user-defined name must not collide with the aggregate.
+        document.Save();
+        model.RemoveGroup(first); document.Save();
+        Check(PluginConfiguration.Load(document.FilePath).DefaultGroup == PluginConfiguration.AllGroupsId);
+        document.Configuration.DefaultGroup = "missing-group"; Reject(document.Save);
+        document.Configuration.DefaultGroup = null!; Reject(document.Save);
+    });
+    Test("All groups: merge enabled dictionaries, deduplicate words and preserve individual searches", () =>
+    {
+        var folder = Path.Combine(root, "all-index"); Directory.CreateDirectory(folder);
+        var a = Path.Combine(folder, "a.mdx"); var b = Path.Combine(folder, "b.mdx");
+        MdxFixture.Write(a, ["apple", "apricot", "résumé"]); MdxFixture.Write(b, ["apple", "banana"]);
+        var file = Path.Combine(folder, "config.json");
+        var config = new PluginConfiguration
+        {
+            DefaultGroup = PluginConfiguration.AllGroupsId,
+            Groups = [
+                new() { Name = "All", GoldenDictGroup = "Target A", Dictionaries = [new() { Name = "A", Path = a }] },
+                new() { Name = "B", Dictionaries = [new() { Name = "B", Path = b }, new() { Name = "Disabled", Path = "missing.mdx", Enabled = false }] },
+                new() { Name = "Empty" }
+            ]
+        };
+        File.WriteAllText(file, config.ToJson());
+        using var service = new DictionaryService(file, Path.Combine(folder, "cache"));
+        service.ReloadAsync().GetAwaiter().GetResult();
+        var snapshot = service.Snapshot!; Check(snapshot is not null, service.LastError ?? "No snapshot");
+        var all = snapshot!.Groups[PluginConfiguration.AllGroupsId];
+        Check(all.Index.Count == 4 && all.Index.Search("apple").Single().Dictionaries.SequenceEqual(new[] { "A", "B" }));
+        Check(all.Index.Search("banana", fuzzy: false).Single().Word == "banana");
+        Check(all.Index.Search("resume", fuzzy: false).Single().Word == "résumé");
+        Check(all.Index.Search("aple").Any(h => h.Word == "apple" && h.Kind == MatchKind.Correction));
+        Check(snapshot.Groups["All"].Index.Search("banana", fuzzy: false).Count == 0);
+        Check(snapshot.Groups["Empty"].Index.Count == 0 && snapshot.Warnings.Count == 0);
+        Check(all.Configuration.GoldenDictGroup is null && all.Configuration.Dictionaries.Count == 2);
+        config.Groups[1].Dictionaries[0].Enabled = false;
+        config.IgnoreDiacritics = false; File.WriteAllText(file, config.ToJson());
+        service.ReloadAsync().GetAwaiter().GetResult(); all = service.Snapshot!.Groups[PluginConfiguration.AllGroupsId];
+        Check(all.Index.Search("banana", fuzzy: false).Count == 0 && all.Index.Search("resume", fuzzy: false).Count == 0);
+    });
     foreach (var fixturePath in args)
         Test("Real MDX: " + Path.GetFileName(fixturePath), () =>
         {

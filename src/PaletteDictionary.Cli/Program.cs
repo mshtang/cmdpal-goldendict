@@ -34,8 +34,8 @@ try
     if (args.Length >= 3 && args[0] == "open")
     {
         var config = PluginConfiguration.Load(args[1]);
-        var group = config.Groups.Single(g => g.Name == config.DefaultGroup);
-        GoldenDictLauncher.Open(config.GoldenDictPath, args[2], group.GoldenDictGroup);
+        var group = config.Groups.FirstOrDefault(g => g.Name == config.DefaultGroup);
+        GoldenDictLauncher.Open(config.GoldenDictPath, args[2], group?.GoldenDictGroup);
         return 0;
     }
     Console.WriteLine("PaletteDictionary.Cli inspect <dictionary.mdx>\nPaletteDictionary.Cli search <config.json> [word]\nPaletteDictionary.Cli open <config.json> <word>");
