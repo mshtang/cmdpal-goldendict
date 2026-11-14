@@ -8,7 +8,7 @@ using PaletteDictionary.Core.ThirdParty;
 using PaletteDictionary.Tests;
 
 Console.OutputEncoding = Encoding.UTF8;
-if (args.Length == 2 && args[0] == "--write-smoke-config")
+if (args.Length == 2 && args[0] is "--write-smoke-config" or "--write-smoke-matrix")
 {
     var configPath = Path.GetFullPath(args[1]);
     var directory = Path.GetDirectoryName(configPath)!;
@@ -20,6 +20,23 @@ if (args.Length == 2 && args[0] == "--write-smoke-config")
         GoldenDictPath = Path.Combine(directory, "goldendict.exe"), DefaultGroup = "Example",
         Groups = [new() { Name = "Example", Dictionaries = [new() { Name = "Synthetic dictionary", Path = dictionary }] }]
     };
+    if (args[0] == "--write-smoke-matrix")
+    {
+        var sources = new List<DictionarySource>();
+        foreach (var modern in new[] { true, false })
+        foreach (var encoding in new[] { "UTF-8", "UTF-16", "GBK", "Big5" })
+        foreach (var compression in new[] { 0, 1, 2 })
+        {
+            var marker = $"fixture-{(modern ? 2 : 1)}-{encoding}-{compression}";
+            var path = Path.Combine(directory, marker + ".mdx");
+            MdxFixture.Write(path, ["apple", "application", "中文", marker], modern, encoding, compression);
+            sources.Add(new() { Name = marker, Path = path });
+        }
+        var encrypted = Path.Combine(directory, "fixture-encrypted.mdx");
+        MdxFixture.Write(encrypted, ["apple", "中文", "fixture-encrypted"], encrypted: true);
+        sources.Add(new() { Name = "fixture-encrypted", Path = encrypted });
+        config.Groups[0].Dictionaries = sources;
+    }
     File.WriteAllText(configPath, config.ToJson());
     Console.WriteLine("Synthetic smoke-test configuration created: " + configPath);
     return 0;
@@ -189,7 +206,10 @@ try
     {
         var path = Path.Combine(root, "service.mdx"); MdxFixture.Write(path, ["apple", "apply"]);
         var configPath = Path.Combine(root, "service.json");
-        File.WriteAllText(configPath, JsonSerializer.Serialize(new { defaultGroup = "EN", groups = new[] { new { name = "EN", dictionaries = new[] { new { name = "Fixture", path } } } } }));
+        File.WriteAllText(configPath, new PluginConfiguration
+        {
+            DefaultGroup = "EN", Groups = [new() { Name = "EN", Dictionaries = [new() { Name = "Fixture", Path = path }] }]
+        }.ToJson());
         using var service = new DictionaryService(configPath, Path.Combine(root, "service-cache"));
         service.ReloadAsync().GetAwaiter().GetResult(); var first = service.Snapshot;
         Check(first?.Groups["EN"].Index.Count == 2, service.LastError ?? "No snapshot");

@@ -66,7 +66,7 @@ english.FinishedLabel=CmdPal GoldenDict is installed. Run Reload in Command Pale
 chinesesimp.FinishedLabel=CmdPal GoldenDict 已安装。请在 Command Palette 中运行 Reload，再打开「本地词典设置」配置词典。
 
 [Files]
-Source: "{#PayloadDirectory}\*"; DestDir: "{app}\App"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "*.pdb,config.local.json,*.mdx,*.mdd,*.pdhw,*.pfx"
+Source: "{#PayloadDirectory}\*"; DestDir: "{app}\App"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "*.pdb,PaletteDictionary.Cli.*,config.local.json,*.mdx,*.mdd,*.pdhw,*.pfx"
 Source: "Manage-Extension.ps1"; DestDir: "{app}"; Flags: ignoreversion
 Source: "Manage-Extension.ps1"; DestName: "CmdPal-GoldenDict-preflight.ps1"; Flags: dontcopy
 

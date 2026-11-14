@@ -54,7 +54,7 @@ internal sealed partial class ConfigurationPage : ContentPage
         var body = new JsonArray();
         var notice = _conflictMessage ?? _document!.RecoveryNotice ?? (_messageKey is null ? null : UiText.Get(_messageKey));
         var footerActions = Actions(Action(UiText.Get("AddGroup"), "addGroup"));
-        if (_conflictMessage is not null) footerActions["actions"]!.AsArray().Add(Action(UiText.Get("Reload"), "reload"));
+        if (_conflictMessage is not null) footerActions["actions"]!.AsArray().Add((JsonNode)Action(UiText.Get("Reload"), "reload"));
         var toolbar = Row(AutoColumn(footerActions));
         if (notice is not null)
         {
@@ -64,11 +64,10 @@ internal sealed partial class ConfigurationPage : ContentPage
             var statusColumn = Column(status);
             statusColumn["width"] = "stretch";
             statusColumn["spacing"] = "Large";
-            toolbar["columns"]!.AsArray().Add(statusColumn);
+            toolbar["columns"]!.AsArray().Add((JsonNode)statusColumn);
         }
         foreach (var column in toolbar["columns"]!.AsArray()) column!["verticalContentAlignment"] = "Center";
-        body.Add(Section("general", UiText.Get("BasicSettings"), new JsonArray
-        {
+        body.Add((JsonNode)Section("general", UiText.Get("BasicSettings"), Nodes(
             TextInput("goldenDictPath", UiText.Get("ProgramPath"), config.GoldenDictPath, UiText.Get("ProgramPathPlaceholder")),
             Row(
                 Column(Choice("defaultGroup", UiText.Get("DefaultGroup"), config.Groups.FindIndex(g => g.Name == config.DefaultGroup).ToString(CultureInfo.InvariantCulture),
@@ -77,13 +76,12 @@ internal sealed partial class ConfigurationPage : ContentPage
                 Column(Toggle("ignoreDiacritics", UiText.Get("IgnoreDiacritics"), config.IgnoreDiacritics))),
             Row(
                 Column(NumberInput("maxResults", UiText.Get("MaxResults"), config.MaxResults, 1, 100)),
-                Column(Choice("maxEditDistance", UiText.Get("MaxEditDistance"), config.MaxEditDistance.ToString(CultureInfo.InvariantCulture), [("0", "0"), ("1", "1"), ("2", "2")])),
+                Column(Choice("maxEditDistance", UiText.Get("MaxEditDistance"), config.MaxEditDistance.ToString(CultureInfo.InvariantCulture), new[] { ("0", "0"), ("1", "1"), ("2", "2") })),
                 Column(NumberInput("debounceMilliseconds", UiText.Get("Debounce"), config.DebounceMilliseconds, 0, 1000)))
-        }, expanded: true));
+        ), expanded: true));
         for (var g = 0; g < config.Groups.Count; g++)
         {
-            var group = config.Groups[g]; var items = new JsonArray
-            {
+            var group = config.Groups[g]; var items = Nodes(
                 Row(Column(TextInput($"g{g}_name", UiText.Get("GroupName"), group.Name)),
                     Column(TextInput($"g{g}_target", UiText.Get("GoldenDictGroup"), group.GoldenDictGroup ?? ""))),
                 new JsonObject
@@ -91,31 +89,30 @@ internal sealed partial class ConfigurationPage : ContentPage
                     ["type"] = "ActionSet", ["spacing"] = "Medium",
                     ["actions"] = new JsonArray(Action(UiText.Get("AddDictionary"), "addDictionary", g), Action(UiText.Get("RemoveGroup"), "removeGroup", g))
                 }
-            };
+            );
             for (var d = 0; d < group.Dictionaries.Count; d++)
             {
                 var source = group.Dictionaries[d];
-                items.Add(new JsonObject
+                items.Add((JsonNode)new JsonObject
                 {
                     ["type"] = "Container", ["separator"] = true, ["spacing"] = "Medium",
-                    ["items"] = new JsonArray
-                    {
+                    ["items"] = Nodes(
                         Row(Column(new JsonObject { ["type"] = "TextBlock", ["text"] = UiText.Format("DictionaryNumber", d + 1), ["weight"] = "Bolder", ["spacing"] = "None" }),
                             AutoColumn(Toggle($"g{g}_d{d}_enabled", UiText.Get("Enabled"), source.Enabled)),
                             AutoColumn(Actions(Action(UiText.Get("RemoveDictionary"), "removeDictionary", g, d)))),
                         Row(Column(TextInput($"g{g}_d{d}_name", UiText.Get("DictionaryName"), source.Name)),
                             Column(TextInput($"g{g}_d{d}_path", UiText.Get("MdxPath"), source.Path), 3))
-                    }
+                    )
                 });
             }
-            body.Add(Section($"group{g}", string.IsNullOrWhiteSpace(group.Name) ? UiText.Format("GroupNumber", g + 1) : group.Name,
+            body.Add((JsonNode)Section($"group{g}", string.IsNullOrWhiteSpace(group.Name) ? UiText.Format("GroupNumber", g + 1) : group.Name,
                 items, expanded: g == _expandedGroup));
         }
-        body.Add(toolbar);
+        body.Add((JsonNode)toolbar);
         return new JsonObject
         {
             ["$schema"] = "http://adaptivecards.io/schemas/adaptive-card.json", ["type"] = "AdaptiveCard", ["version"] = "1.5",
-            ["body"] = body, ["actions"] = new JsonArray { Action(UiText.Get("Save"), "save") }
+            ["body"] = body, ["actions"] = Nodes(Action(UiText.Get("Save"), "save"))
         }.ToJsonString();
     }
 
@@ -212,7 +209,7 @@ internal sealed partial class ConfigurationPage : ContentPage
         // Toggle visibility in the renderer so folding a section keeps all unsaved inputs.
         var down = Chevron(id + "_down", up: false, visible: !expanded);
         var up = Chevron(id + "_up", up: true, visible: expanded);
-        var arrow = AutoColumn(down); arrow["items"]!.AsArray().Add(up);
+        var arrow = AutoColumn(down); arrow["items"]!.AsArray().Add((JsonNode)up);
         arrow["width"] = "32px";
         var row = Row(Column(Heading(title)), arrow);
         row["spacing"] = "None";
@@ -253,6 +250,8 @@ internal sealed partial class ConfigurationPage : ContentPage
             ["width"] = "16px", ["height"] = "16px", ["horizontalAlignment"] = "Center", ["altText"] = ""
         };
     }
+    // Bind to JsonNode overloads rather than the reflection-based Add<T> serializer.
+    private static JsonArray Nodes(params JsonNode[] nodes) => new(nodes);
     private static JsonObject Note(string text) => new() { ["type"] = "TextBlock", ["text"] = text, ["wrap"] = true, ["isSubtle"] = true };
     private static JsonObject TextInput(string id, string label, string value, string placeholder = "") => new()
     { ["type"] = "Input.Text", ["id"] = id, ["label"] = label, ["value"] = value, ["placeholder"] = placeholder, ["spacing"] = "None" };

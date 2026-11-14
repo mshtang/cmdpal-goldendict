@@ -46,10 +46,31 @@ try {
         }
         $registeredBefore=@(Get-OwnedPackages)
         Stop-OwnedServer (@($applicationDirectory)+@($registeredBefore | ForEach-Object InstallLocation))
-        # Appx cmdlets resolve wildcard paths; escape literal square brackets.
-        Add-AppxPackage -Register ([Management.Automation.WildcardPattern]::Escape($manifest)) -ForceApplicationShutdown -ErrorAction Stop
-        $registered=@(Get-OwnedPackages | Where-Object { [IO.Path]::GetFullPath($_.InstallLocation).TrimEnd('\') -eq $applicationDirectory.TrimEnd('\') -and [version]$_.Version -eq $Version })
-        if($registered.Count -ne 1) { throw 'Windows did not register the expected extension at the installation directory.' }
+        # Windows treats registering an identical package version from a different
+        # directory as a successful no-op, even with ForceUpdateFromAnyVersion.
+        # Relocate only our development registration, retaining application data.
+        $relocated=@()
+        try {
+            foreach($package in $registeredBefore) {
+                if([version]$package.Version -eq $Version -and [IO.Path]::GetFullPath($package.InstallLocation).TrimEnd('\') -ne $applicationDirectory.TrimEnd('\')) {
+                    if(!$package.IsDevelopmentMode){throw 'Cannot relocate a non-development package of the same version.'}
+                    Remove-AppxPackage -Package $package.PackageFullName -PreserveApplicationData -ErrorAction Stop
+                    $relocated+=,$package
+                }
+            }
+            # Appx cmdlets resolve wildcard paths; escape literal square brackets.
+            Add-AppxPackage -Register ([Management.Automation.WildcardPattern]::Escape($manifest)) -ForceApplicationShutdown -ErrorAction Stop
+            $registered=@(Get-OwnedPackages | Where-Object { [IO.Path]::GetFullPath($_.InstallLocation).TrimEnd('\') -eq $applicationDirectory.TrimEnd('\') -and [version]$_.Version -eq $Version })
+            if($registered.Count -ne 1) { throw 'Windows did not register the expected extension at the installation directory.' }
+        }
+        catch {
+            $registrationError=$_
+            foreach($package in $relocated) {
+                $previousManifest=Join-Path $package.InstallLocation 'AppxManifest.xml'
+                Add-AppxPackage -Register ([Management.Automation.WildcardPattern]::Escape($previousManifest)) -ForceApplicationShutdown -ErrorAction Stop
+            }
+            throw $registrationError
+        }
     }
     else {
         # Only unregister the copy owned by this installation, never a newer copy elsewhere.

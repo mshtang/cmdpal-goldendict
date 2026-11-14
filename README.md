@@ -6,12 +6,12 @@ Offline MDX headword suggestions for **PowerToys Command Palette**, with definit
 
 Type a word, choose a suggestion, and press Enter. GoldenDict-ng renders the dictionary entry with its own styles and resources. The extension builds its own headword index instead of depending on GoldenDict-ng's private indexes.
 
-**Current release: 2.2.0 development installer. Windows Developer Mode is required.** The installer checks this setting and does not change it. A production-signed installer is not available yet.
+**Current source version: 2.2.1. Windows Developer Mode is required for development installers.** The installer checks this setting and does not change it. A production-signed installer is not available yet.
 
 ## Install
 
 1. Install Command Palette and GoldenDict-ng, and configure your dictionaries in GoldenDict-ng.
-2. On Windows 11 x64, download [CmdPal-GoldenDict-2.2.0-dev-Setup-x64.exe](https://github.com/mshtang/cmdpal-goldendict/releases/download/v2.2.0/CmdPal-GoldenDict-2.2.0-dev-Setup-x64.exe).
+2. On Windows 11 x64, download the x64 development EXE installer from [Releases](https://github.com/mshtang/cmdpal-goldendict/releases).
 3. With Windows Developer Mode already enabled, double-click the installer and complete the wizard. The development installer is unsigned; Windows may show an unknown-publisher or SmartScreen prompt.
 4. Run **Reload** in Command Palette, then open **Local Dictionary** and access settings from its context menu.
 5. Paste your GoldenDict-ng executable path and add the MDX dictionaries used for suggestions. Save.
@@ -84,6 +84,8 @@ Build the EXE using Inno Setup 6/7:
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for synthetic integration tests, installer tests, portable compiler setup, architecture support, and the GitHub Actions release process. Local configuration, dictionary files, and caches are excluded from the public repository and installer.
+
+Version 2.2.1 source builds publish a trimmed, self-contained extension. They still run without a shared .NET runtime and keep English/Chinese resources and runtime diagnostic libraries. The diagnostic CLI and PDB symbols are excluded from the user package; run the CLI from its source project when needed. Published installers are listed on [Releases](https://github.com/mshtang/cmdpal-goldendict/releases). See [validation results](VALIDATION.md) for local package measurements.
 
 ## License
 

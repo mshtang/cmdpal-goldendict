@@ -24,6 +24,9 @@ if(!$IsccPath) {
 }
 if(!$IsccPath -or !(Test-Path -LiteralPath $IsccPath)){throw 'Install Inno Setup 6/7 or pass -IsccPath to ISCC.exe.'}
 if(!$SkipBuild){& (Join-Path $PSScriptRoot 'Build.ps1') -Runtime $Runtime -OutputDirectory $payload}
+# The installer promises no shared .NET prerequisite. Reject a framework-dependent
+# or stale/untrimmed payload even when the caller uses -SkipBuild.
+& (Join-Path $PSScriptRoot 'Test-Publish.ps1') -PublishDirectory $payload -Runtime $Runtime
 [xml]$manifest=Get-Content -LiteralPath (Join-Path $payload 'AppxManifest.xml') -Raw
 if($manifest.Package.Identity.Version -ne "$version.0"){throw 'Payload version does not match Directory.Build.props.'}
 $architecture=$Runtime.Replace('win-','')

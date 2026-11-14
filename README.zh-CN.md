@@ -2,14 +2,14 @@
 
 PowerToys Command Palette 的离线 MDX 词头候选扩展。输入时在插件自己的词头索引中补全、纠错，回车后交给已安装的 GoldenDict-ng 展示释义。
 
-当前版本 **2.2.0**。支持中英文紧凑设置页及 EXE 安装向导。[English](README.md) · [下载与版本记录](https://github.com/mshtang/cmdpal-goldendict/releases)。
+当前源码版本 **2.2.1**。支持中英文紧凑设置页及 EXE 安装向导。[English](README.md) · [下载与版本记录](https://github.com/mshtang/cmdpal-goldendict/releases)。
 
 **当前发布的是未签名的开发版安装包，需要已开启 Windows 开发者模式。安装器只检查，不修改系统设置。**
 
 ## EXE 安装、升级与卸载
 
 1. 准备 Windows 11 x64、Command Palette 和 GoldenDict-ng，并先在 GoldenDict-ng 配好词典。
-2. 从 [Releases](https://github.com/mshtang/cmdpal-goldendict/releases) 下载 `CmdPal-GoldenDict-2.2.0-dev-Setup-x64.exe`，双击安装。无需另装 .NET 运行时；开发版未签名，Windows 可能提示未知发布者或 SmartScreen。
+2. 从 [Releases](https://github.com/mshtang/cmdpal-goldendict/releases) 下载 Windows x64 开发版 EXE 安装包，双击安装。无需另装 .NET 运行时；开发版未签名，Windows 可能提示未知发布者或 SmartScreen。
 3. 在 Palette 运行 **Reload**，打开「本地词典 / Local Dictionary」，从上下文菜单进入设置，粘贴程序和 MDX 路径，保存即可。
 
 以后运行新版安装器即可覆盖升级，已有配置与缓存会保留；降级会被阻止。卸载时在 Windows 已安装的应用中选择 **CmdPal GoldenDict (Development installer)**，安装器会注销扩展并清理程序文件，保留用户配置与缓存，不影响 GoldenDict-ng 或原始词典。
@@ -138,7 +138,9 @@ MDX 必须已经在 GoldenDict-ng 中配置。插件不会自动修改它的词�
 .\scripts\Install.ps1
 ```
 
-默认构建 `win-x64` 自包含版本。`Build.ps1 -Runtime win-arm64` 可构建 ARM64；`-FrameworkDependent` 可减小分发体积，但目标电脑需 .NET 10 运行时。ARM64 没有在 ARM64 硬件上验证。
+默认构建 `win-x64` 完整裁剪的自包含版本，无需另装 .NET；保留中英文资源及运行时诊断原生库。用户包不包含诊断 CLI 或 PDB。`Build.ps1 -Runtime win-arm64` 可构建 ARM64；`-FrameworkDependent` 生成未裁剪的共享运行时版本，目标电脑需同架构的 .NET 10 运行时，该模式仅用于源码构建，不用于 EXE 安装器。ARM64 没有在 ARM64 硬件上验证。
+
+2.2.1 源码构建采用上述精简方案。已发布的安装包以 [Releases](https://github.com/mshtang/cmdpal-goldendict/releases) 为准，本机构建的体积与测试记录见 [VALIDATION.md](VALIDATION.md)。
 
 调试命令行工具：
 
@@ -148,7 +150,7 @@ dotnet run --project .\src\PaletteDictionary.Cli -- search .\config.example.json
 dotnet run --project .\src\PaletteDictionary.Cli -- open .\config.example.json apple
 ```
 
-预编译目录也包含 `PaletteDictionary.Cli.exe`，可用相同的 `inspect`、`search`、`open` 参数直接运行，无需 SDK。
+诊断 CLI 按需从上述源码命令运行；如需独立分发，可单独发布到 `artifacts/cli`，不要放入扩展发布目录。
 
 额外的跨进程 COM 集成测试会启动本扩展、检查候选页面与原生设置表单，然后释放宿主。它使用临时配置副本，不会修改传入的配置，不会发送查词或修改 GoldenDict 配置：
 

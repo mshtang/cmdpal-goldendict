@@ -33,6 +33,16 @@ File.WriteAllText(testConfigPath, initial.ToJson());
 var info = new ProcessStartInfo(Path.GetFullPath(args[0])) { UseShellExecute = false, CreateNoWindow = true };
 info.ArgumentList.Add("--smoke-server");
 info.Environment["PALETTEDICTIONARY_CONFIG"] = testConfigPath;
+if (Environment.GetEnvironmentVariable("PALETTEDICTIONARY_SMOKE_NO_SHARED_RUNTIME") == "1")
+{
+    // Exercise self-contained resolution without inheriting this client's shared runtime.
+    var emptyRuntime = Path.Combine(temporary, "no-shared-runtime");
+    Directory.CreateDirectory(emptyRuntime);
+    info.Environment["DOTNET_ROOT_X64"] = emptyRuntime;
+    info.Environment["DOTNET_ROOT_ARM64"] = emptyRuntime;
+    info.Environment["DOTNET_ROOT"] = emptyRuntime;
+    info.Environment["DOTNET_DISABLE_GUI_ERRORS"] = "1";
+}
 using var server = Process.Start(info) ?? throw new Exception("Server failed to start.");
 try
 {
@@ -73,6 +83,17 @@ try
             for (var wait = 0; wait < 50 && page.GetItems().All(i => i.Title != "apple"); wait++) Thread.Sleep(100);
             if (page.GetItems().All(i => i.Title != "apple")) throw new Exception("Prefix search did not update.");
             Console.WriteLine("PASS live dynamic page: typo → prefix");
+            if (initial.Groups[0].Dictionaries.All(d => d.Name.StartsWith("fixture-", StringComparison.Ordinal)))
+            {
+                foreach (var source in initial.Groups[0].Dictionaries)
+                {
+                    page.SearchText = source.Name;
+                    WaitFor(() => page.GetItems().Any(i => i.Title == source.Name), "Published extension failed to decode " + source.Name);
+                }
+                page.SearchText = "中文";
+                WaitFor(() => page.GetItems().Any(i => i.Title == "中文"), "Published extension lost CJK headwords.");
+                Console.WriteLine($"PASS published MDX matrix: {initial.Groups[0].Dictionaries.Count} formats (versions, encodings, compression, encryption) and CJK");
+            }
             TestSettings(provider, testConfigPath);
             TestSystemLanguage(provider, testConfigPath);
             TestSettingsConflict(provider, testConfigPath);

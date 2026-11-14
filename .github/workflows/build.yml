@@ -34,12 +34,7 @@ jobs:
         run: ./scripts/Build-Installer.ps1
       - name: Test published extension with a synthetic dictionary
         shell: pwsh
-        run: |
-          $config = Join-Path $env:RUNNER_TEMP 'cmdpal-smoke/config.json'
-          & ./tests/PaletteDictionary.Tests/bin/Release/net10.0/PaletteDictionary.Tests.exe --write-smoke-config $config
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          & ./tests/PaletteDictionary.Smoke/bin/Release/net10.0-windows10.0.26100.0/PaletteDictionary.Smoke.exe ./artifacts/installer-payload/win-x64/PaletteDictionary.Extension.exe $config en
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+        run: ./scripts/Test-Trimmed.ps1
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: development-installer-x64

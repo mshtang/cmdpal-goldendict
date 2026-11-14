@@ -12,6 +12,7 @@ $cache=Join-Path $env:LOCALAPPDATA 'PaletteDictionary\cache'
 $cacheBefore=@{}
 if(Test-Path -LiteralPath $cache){Get-ChildItem -LiteralPath $cache -File | ForEach-Object {$cacheBefore[$_.FullName]=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash}}
 $smoke=Join-Path $projectRoot 'tests\PaletteDictionary.Smoke\bin\Release\net10.0-windows10.0.26100.0\PaletteDictionary.Smoke.exe'
+$rollbackRoot=Join-Path $testRoot 'rollback'
 function Assert-Preserved {
     if($hash -and (!(Test-Path -LiteralPath $configuration) -or (Get-FileHash -LiteralPath $configuration -Algorithm SHA256).Hash -ne $hash)){throw 'User configuration changed during installer test.'}
     foreach($file in $cacheBefore.Keys){if(!(Test-Path -LiteralPath $file) -or (Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash -ne $cacheBefore[$file]){throw "Existing cache changed: $file"}}
@@ -20,7 +21,12 @@ try {
     foreach($pass in @(1,2)) {
         $log=Join-Path $projectRoot "artifacts\installer-test-$pass.log"
         $process=Start-Process -FilePath $Installer -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/CLOSEAPPLICATIONS',('/DIR="'+$testRoot+'"'),('/LOG="'+$log+'"')) -WindowStyle Hidden -PassThru -Wait
-        if($process.ExitCode -ne 0){throw "Installer failed ($($process.ExitCode)); see $log"}
+        if($process.ExitCode -ne 0){
+            # Uninstall writes the helper log too; preserve registration failures first.
+            $helperLog=Join-Path $env:LOCALAPPDATA 'CmdPalGoldenDict\Logs\installer.log'
+            if(Test-Path -LiteralPath $helperLog){Copy-Item -LiteralPath $helperLog -Destination (Join-Path $projectRoot "artifacts\installer-helper-failure-$pass.log") -Force}
+            throw "Installer failed ($($process.ExitCode)); see $log"
+        }
         $package=@(Get-AppxPackage -Name PaletteDictionary | Where-Object {$_.InstallLocation -eq (Join-Path $testRoot 'App')})
         if($package.Count -ne 1){throw 'Installer returned success without the expected package registration.'}
         & $smoke --installed
@@ -32,12 +38,28 @@ try {
     $helper=Join-Path $testRoot 'Manage-Extension.ps1'
     & $nativePowerShell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $helper -Action Check -InstallRoot $testRoot -Version 0.0.0.0
     if($LASTEXITCODE -eq 0){throw 'Downgrade preflight did not reject an older version.'}
+    # Force a deployment error after same-version relocation has removed the old
+    # registration; the helper must restore that registration before returning.
+    $brokenApp=Join-Path $rollbackRoot 'App'
+    [IO.Directory]::CreateDirectory($brokenApp) | Out-Null
+    [xml]$brokenManifest=Get-Content -LiteralPath (Join-Path $testRoot 'App\AppxManifest.xml') -Raw
+    $version=[string]$brokenManifest.Package.Identity.Version
+    $brokenManifest.Package.AppendChild($brokenManifest.CreateElement('InvalidManifestElement',$brokenManifest.Package.NamespaceURI)) | Out-Null
+    $brokenManifest.Save((Join-Path $brokenApp 'AppxManifest.xml'))
+    & $nativePowerShell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $helper -Action Install -InstallRoot $rollbackRoot -Version $version
+    if($LASTEXITCODE -eq 0){throw 'Broken relocation unexpectedly succeeded.'}
+    if(!(Get-AppxPackage -Name PaletteDictionary | Where-Object {$_.InstallLocation -eq (Join-Path $testRoot 'App')})){throw 'Failed relocation did not restore the previous registration.'}
+    & $smoke --installed
+    if($LASTEXITCODE -ne 0){throw 'Restored registration failed COM activation.'}
+    Write-Host 'PASS failed same-version relocation restores the previous working registration'
     & $nativePowerShell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $helper -Action Uninstall -InstallRoot (Join-Path $projectRoot 'artifacts\installer-tests\different copy')
     if($LASTEXITCODE -ne 0){throw 'Uninstaller ownership test failed.'}
     if(!(Get-AppxPackage -Name PaletteDictionary | Where-Object {$_.InstallLocation -eq (Join-Path $testRoot 'App')})){throw 'An unrelated uninstaller removed the registered extension.'}
     Write-Host 'PASS downgrade rejection and uninstaller registration ownership'
 }
 finally {
+    if(![IO.Path]::GetFullPath($rollbackRoot).StartsWith($testRoot+'\',[StringComparison]::OrdinalIgnoreCase)){throw 'Unsafe rollback test directory.'}
+    if(Test-Path -LiteralPath $rollbackRoot){Remove-Item -LiteralPath $rollbackRoot -Recurse -Force}
     $uninstaller=Join-Path $testRoot 'unins000.exe'
     if(Test-Path -LiteralPath $uninstaller) {
         $process=Start-Process -FilePath $uninstaller -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART') -WindowStyle Hidden -PassThru -Wait
