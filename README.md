@@ -29,7 +29,7 @@ Open **Local Dictionary** in Palette:
 | `aple` / `appel` | Spelling corrections, including adjacent letter swaps |
 | **Look up:** action | Sends the original input directly to GoldenDict-ng |
 
-Identical headwords from multiple dictionaries are merged, with source dictionary names shown below each result. The group filter selects which dictionaries supply suggestions. The optional GoldenDict group field selects an existing group for definitions; blank preserves GoldenDict-ng's current group.
+Identical headwords from multiple dictionaries are merged. Suggestions show the word and, for spelling corrections, the edit count. The group filter selects which dictionaries supply suggestions. The optional GoldenDict group field selects an existing group for definitions; blank preserves GoldenDict-ng's current group.
 
 Use Palette's own command settings to assign an alias or global shortcut. The extension does not register a separate system shortcut.
 

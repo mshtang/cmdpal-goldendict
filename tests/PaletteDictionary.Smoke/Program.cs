@@ -66,7 +66,7 @@ try
         if (items.Any(i => i.Title == "apple"))
         {
             var apple = items.First(i => i.Title == "apple");
-            if (!apple.Subtitle.StartsWith(UiText.Correction(1), StringComparison.Ordinal)) throw new Exception("Correction label missing.");
+            if (apple.Subtitle != UiText.Correction(1)) throw new Exception("Correction label should omit dictionary names and trailing separators.");
             if (apple.MoreCommands.Length < 2) throw new Exception("Candidate context menu missing.");
             Console.WriteLine($"PASS out-of-process COM: {items.Length} items; {apple.Title} / {apple.Subtitle}");
             page.SearchText = "appl";
@@ -222,6 +222,8 @@ static void TestAllGroups(ICommandProvider provider, string file)
     var dictionary = config.Groups[second].Dictionaries.Count;
     inputs[$"g{second}_d{dictionary}_path"] = config.Groups[0].Dictionaries[0].Path;
     inputs[$"g{second}_d{dictionary}_name"] = "Secondary source";
+    // Keep the word available only through the second group; source names are no longer displayed.
+    for (var d = 0; d < config.Groups[0].Dictionaries.Count; d++) inputs[$"g0_d{d}_enabled"] = "false";
     inputs["defaultGroup"] = "-1";
     form.SubmitForm(inputs.ToJsonString(), "{\"operation\":\"save\"}");
     if (PluginConfiguration.Load(file).DefaultGroup != PluginConfiguration.AllGroupsId || Inputs(settings.GetContent().Single().As<IFormContent>())["defaultGroup"]?.ToString() != "-1")
@@ -230,9 +232,13 @@ static void TestAllGroups(ICommandProvider provider, string file)
     WaitFor(() => page.Filters?.CurrentFilterId == PluginConfiguration.AllGroupsId, "Saving All did not update the active search filter.");
     if (page.Filters!.GetFilters().Length != config.Groups.Count + 1) throw new Exception("All filter is missing.");
     page.SearchText = "apple";
-    WaitFor(() => page.GetItems().Any(i => i.Title == "apple" && i.Subtitle.Contains("Secondary source") && i.Subtitle.Contains("Oxford’s")), "All did not merge dictionary sources across groups.");
+    WaitFor(() => page.GetItems().Any(i => i.Title == "apple" && i.Subtitle == ""), "All did not search the enabled dictionary in the second group.");
+    page.Filters.CurrentFilterId = config.Groups[0].Name;
+    page.SearchText = "";
+    WaitFor(() => page.GetItems().Any(i => i.Title == UiText.Format("HeadwordCount", 0) && i.Subtitle == ""), "The disabled first group should be empty.");
     page.Filters.CurrentFilterId = config.Groups[second].Name;
-    WaitFor(() => page.GetItems().Any(i => i.Title == "apple" && i.Subtitle.Contains("Secondary source") && !i.Subtitle.Contains("Oxford’s")), "Individual group filtering stopped working.");
+    page.SearchText = "apple";
+    WaitFor(() => page.GetItems().Any(i => i.Title == "apple" && i.Subtitle == ""), "Individual group filtering stopped working.");
     foreach (var selected in new[] { "0", "-1" })
     {
         form = settings.GetContent().Single().As<IFormContent>(); inputs = Inputs(form); inputs["defaultGroup"] = selected;

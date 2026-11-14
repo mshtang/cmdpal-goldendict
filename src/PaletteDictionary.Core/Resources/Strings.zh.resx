@@ -25,7 +25,7 @@
     <value>查词</value>
   </data>
   <data xml:space="preserve" name="SearchPlaceholder">
-    <value>输入单词或短语，支持补全与拼写纠错</value>
+    <value>在 GoldenDict 中搜索</value>
   </data>
   <data xml:space="preserve" name="ExtensionSubtitle">
     <value>词头补全与拼写纠错 · 在 GoldenDict-ng 中查看释义</value>
@@ -337,10 +337,10 @@
     <value>词典 {0}</value>
   </data>
   <data xml:space="preserve" name="Correction">
-    <value>拼写纠错 · {0} 处差异 · </value>
+    <value>拼写纠错 · {0} 处差异</value>
   </data>
   <data xml:space="preserve" name="HeadwordCount">
-    <value>{0:N0} 个词头 · {1}</value>
+    <value>从 {0:N0} 个词头中搜索</value>
   </data>
   <data xml:space="preserve" name="DirectLookup">
     <value>直接查询：{0}</value>
@@ -385,6 +385,6 @@
     <value>默认</value>
   </data>
   <data name="CorrectionSingular" xml:space="preserve">
-    <value>拼写纠错 · {0} 处差异 · </value>
+    <value>拼写纠错 · {0} 处差异</value>
   </data>
 </root>

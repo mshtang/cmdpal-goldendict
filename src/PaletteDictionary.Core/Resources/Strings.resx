@@ -25,7 +25,7 @@
     <value>Look up</value>
   </data>
   <data xml:space="preserve" name="SearchPlaceholder">
-    <value>Type a word or phrase for suggestions and spelling corrections</value>
+    <value>Search in GoldenDict</value>
   </data>
   <data xml:space="preserve" name="ExtensionSubtitle">
     <value>Headword suggestions and spelling corrections · Definitions in GoldenDict-ng</value>
@@ -337,10 +337,10 @@
     <value>Dictionary {0}</value>
   </data>
   <data xml:space="preserve" name="Correction">
-    <value>Spelling correction · {0} edits · </value>
+    <value>Spelling correction · {0} edits</value>
   </data>
   <data xml:space="preserve" name="HeadwordCount">
-    <value>{0:N0} headwords · {1}</value>
+    <value>Search from {0:N0} headwords</value>
   </data>
   <data xml:space="preserve" name="DirectLookup">
     <value>Look up: {0}</value>
@@ -385,6 +385,6 @@
     <value>Default</value>
   </data>
   <data name="CorrectionSingular" xml:space="preserve">
-    <value>Spelling correction · {0} edit · </value>
+    <value>Spelling correction · {0} edit</value>
   </data>
 </root>

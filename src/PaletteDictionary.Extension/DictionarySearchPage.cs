@@ -100,7 +100,7 @@ internal sealed partial class DictionarySearchPage : DynamicListPage, IDisposabl
                 var items = hits.Select(hit => (IListItem)new ListItem(new LookupCommand(config.GoldenDictPath, hit.Word, group.Configuration.GoldenDictGroup))
                 {
                     Title = hit.Word,
-                    Subtitle = (hit.Kind == MatchKind.Correction ? UiText.Correction(hit.EditDistance) : "") + string.Join(" · ", hit.Dictionaries),
+                    Subtitle = hit.Kind == MatchKind.Correction ? UiText.Correction(hit.EditDistance) : "",
                     Icon = new IconInfo(hit.Kind == MatchKind.Correction ? "\uE70F" : "\uE82D"),
                     TextToSuggest = hit.Word,
                     MoreCommands = ContextCommands()
@@ -129,10 +129,10 @@ internal sealed partial class DictionarySearchPage : DynamicListPage, IDisposabl
     private IListItem[] IdleItems(ServiceSnapshot? snapshot, GroupIndex? group)
     {
         var items = new List<IListItem>();
-        if (group is not null) items.Add(Status(UiText.Format("HeadwordCount", group.Index.Count, group.Configuration.Name), UiText.Get("LookupHint")));
+        if (group is not null) items.Add(Status(UiText.Format("HeadwordCount", group.Index.Count)));
         if (group is null || group.Index.Count == 0)
             items.Add(new ListItem(_settingsPage) { Title = UiText.Get("ConfigureDictionaries"), Subtitle = UiText.Get("ConfigureHint"), Icon = new IconInfo("\uE713") });
-        items.Add(new ListItem(_settingsPage) { Title = UiText.Get("OpenSettings"), Subtitle = UiText.Get("ManageSettings"), Icon = new IconInfo("\uE713") });
+        items.Add(new ListItem(_settingsPage) { Title = UiText.Get("OpenSettings"), Icon = new IconInfo("\uE713") });
         items.Add(new ListItem(new RefreshCommand(_service)) { Title = UiText.Get("ReloadDictionaries"), Icon = new IconInfo("\uE72C") });
         AddStatus(items, snapshot); return items.ToArray();
     }
@@ -157,7 +157,7 @@ internal sealed partial class DictionarySearchPage : DynamicListPage, IDisposabl
             foreach (var warning in snapshot.Warnings) items.Add(Status(UiText.Get("DictionariesUnavailable"), warning));
         }
     }
-    private ListItem Status(string title, string subtitle) => new(new NoOpCommand())
+    private ListItem Status(string title, string subtitle = "") => new(new NoOpCommand())
     { Title = title, Subtitle = subtitle, Icon = new IconInfo("\uE946"), MoreCommands = ContextCommands() };
     public void Dispose()
     {

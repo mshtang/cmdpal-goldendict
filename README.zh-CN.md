@@ -46,7 +46,7 @@ PowerToys Command Palette 的离线 MDX 词头候选扩展。输入时在插件�
 - `apple`：精确匹配排在最前。
 - `aple`、`appel`：拼写纠错。
 
-方向键选择候选，Enter 在 GoldenDict-ng 主窗口中打开；“直接查询”保留原始输入。Tab 可利用宿主提供的词头补全操作。词典名称显示在候选的副标题中，相同拼写的词头合并为一项。
+方向键选择候选，Enter 在 GoldenDict-ng 主窗口中打开；“直接查询”保留原始输入。Tab 可利用宿主提供的词头补全操作。候选只显示词头，拼写纠错另显示差异数量；相同拼写的词头合并为一项。
 
 查询以编码后的 `goldendict://...` 字符串作为 exe 的单个参数发送，并显式指定主窗口。这不依赖系统注册 URL 协议，也能兼容本次安装的较旧 GoldenDict-ng。所有参数通过 .NET ArgumentList 传递，不经过 cmd/PowerShell 解释。
 
@@ -99,7 +99,7 @@ Command Palette 会将内嵌设置放在一个共享外层卡片中，并在提�
 | `ignoreDiacritics` | 候选匹配是否忽略重音符号；保留原始词头显示和跳转 |
 | `groups[].name` | Palette 中的分组名称 |
 | `groups[].goldenDictGroup` | GoldenDict-ng 中已经存在的分组名称；null/省略则沿用其当前分组 |
-| `dictionaries[].name` | 候选中显示的词典名称 |
+| `dictionaries[].name` | 词典名称，用于配置、诊断和命令行输出 |
 | `dictionaries[].path` | MDX 路径，支持相对配置目录的路径及 `%变量%` |
 | `dictionaries[].enabled` | 是否参与该组的候选检索 |
 
